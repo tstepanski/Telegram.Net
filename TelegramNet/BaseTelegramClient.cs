@@ -2,11 +2,10 @@ using System;
 using TelegramNet.Entities;
 using TelegramNet.Extensions.Base;
 using TelegramNet.Services;
-using TelegramNet.Types;
 
 namespace TelegramNet
 {
-    public abstract class BaseTelegramClient : ITelegramClient
+    public abstract class BaseTelegramClient
     {
         internal abstract TelegramApiClient TelegramApi { get; }
 
