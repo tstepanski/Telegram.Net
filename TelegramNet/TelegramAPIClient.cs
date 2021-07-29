@@ -1,9 +1,8 @@
 using System.Net.Http;
 using System.Threading.Tasks;
-using TelegramNet.Services.HTTP.Entities;
-using TelegramNet.Services.ReceivingUpdates;
+using TelegramNet.Services.Http.Entities;
 
-namespace TelegramNet.Services
+namespace TelegramNet
 {
     internal class TelegramApiClient
     {
@@ -13,11 +12,6 @@ namespace TelegramNet.Services
         }
 
         private readonly TelegramClient _client;
-
-        public async Task<Update[]> GetUpdatesAsync()
-        {
-            return await Request<Update[]>("getUpdates", HttpMethod.Get);
-        }
 
         public async Task<T> RequestAsync<T>(string method, HttpMethod m, string json = null)
         {

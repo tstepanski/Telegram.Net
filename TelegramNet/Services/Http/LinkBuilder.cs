@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TelegramNet.Services.HTTP
+namespace TelegramNet.Services.Http
 {
     internal static class LinkBuilder
     {

@@ -1,7 +1,7 @@
 using System.Text.Json;
 using TelegramNet.ExtraTypes;
 
-namespace TelegramNet.Services.HTTP.Entities
+namespace TelegramNet.Services.Http.Entities
 {
     public class RequestResult<T>
     {

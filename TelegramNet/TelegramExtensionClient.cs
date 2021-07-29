@@ -1,6 +1,6 @@
 using System.Net.Http;
 using System.Threading.Tasks;
-using TelegramNet.Services.HTTP.Entities;
+using TelegramNet.Services.Http.Entities;
 
 namespace TelegramNet
 {

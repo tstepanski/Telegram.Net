@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace TelegramNet.Services.HTTP.Entities
+namespace TelegramNet.Services.Http.Entities
 {
     internal class HttpResult
     {

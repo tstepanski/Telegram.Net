@@ -1,6 +1,6 @@
 using System;
 
-namespace TelegramNet.Services.HTTP.Entities
+namespace TelegramNet.Services.Http.Entities
 {
     public class EnsureFailedException<T> : SystemException
     {

@@ -31,7 +31,7 @@ namespace Test
 
             var mess = await chat.SendMessageAsync("hello");
 
-            var edited = await mess.EditAsync(new MessageEditor().WithText("edited"));
+            var edited = await mess.EditTextAsync(new MessageTextEditor().WithText("edited"));
 
             Assert.IsTrue(edited);
         }

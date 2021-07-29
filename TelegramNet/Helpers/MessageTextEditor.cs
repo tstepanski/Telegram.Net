@@ -2,17 +2,23 @@ using System;
 using System.Text.Json.Serialization;
 using TelegramNet.Enums;
 
-
 namespace TelegramNet.Helpers
 {
-    public class MessageEditor
+    public class MessageTextEditor
     {
-        [JsonPropertyName("chat_id")] public int ChatId { get; set; }
+        [JsonIgnore]
+        internal ChatId ChatId
+        {
+            get => ChatId.FromObject(ChatIndeficator);
+            set => ChatIndeficator = value.Fetch();
+        }
+        
+        [JsonPropertyName("chat_id")] internal object ChatIndeficator { get; set; }
 
-        [JsonPropertyName("message_id")] public int MessageId { get; set; }
+        [JsonPropertyName("message_id")] internal int MessageId { get; set; }
 
         [JsonPropertyName("inline_message_id")]
-        public string InlineMessageId { get; set; }
+        internal string InlineMessageId { get; set; }
 
         [JsonPropertyName("text")]
         public string Text { get; set; }
@@ -20,19 +26,16 @@ namespace TelegramNet.Helpers
         [JsonPropertyName("parse_mode")]
         public string ParseMode { get; set; } = "MarkdownV2";
 
-        // [JsonPropertyName("entities")]
-        // public MessageCaption[] Entities { get; set; }
-
         [JsonPropertyName("disable_web_page_preview")]
         public bool DisableWebPagePreview { get; set; }
 
-        public MessageEditor WithText(string text)
+        public MessageTextEditor WithText(string text)
         {
             Text = text;
             return this;
         }
 
-        public MessageEditor WithParseMode(ParseMode mode)
+        public MessageTextEditor WithParseMode(ParseMode mode)
         {
             ParseMode = mode switch
             {
@@ -42,7 +45,5 @@ namespace TelegramNet.Helpers
             };
             return this;
         }
-
-        //TODO Add markups
     }
 }

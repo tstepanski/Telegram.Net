@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using TelegramNet.ExtraTypes;
 
 namespace TelegramNet.Entities.Interfaces
 {
@@ -7,12 +8,12 @@ namespace TelegramNet.Entities.Interfaces
         public int Id { get; }
         public bool IsBot { get; }
         public string FirstName { get; }
-        public string LastName { get; }
-        public string Username { get; }
-        public string LanguageCode { get; }
-        public bool CanJoinGroups { get; }
-        public bool CanReadAllGroupMessages { get; }
-        public bool SupportsInlineQueries { get; }
+        public Optional<string> LastName { get; }
+        public Optional<string> Username { get; }
+        public Optional<string> LanguageCode { get; }
+        public Optional<bool> CanJoinGroups { get; }
+        public Optional<bool> CanReadAllGroupMessages { get; }
+        public Optional<bool> SupportsInlineQueries { get; }
 
         public UserMention Mention { get; }
 

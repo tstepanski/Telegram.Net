@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TelegramNet.ExtraTypes;
 
 namespace TelegramNet.Entities.Interfaces
 {
@@ -8,22 +9,35 @@ namespace TelegramNet.Entities.Interfaces
     {
         public int Id { get; }
 
-        public ITelegramUser Author { get; }
-
-        public ITelegramChat SenderChat { get; }
-
-        public DateTime Timestamp { get; }
-
-        public string Text { get; }
-
+        public Optional<ITelegramUser> Author { get; }
+        public Optional<ITelegramChat> SenderChat { get; }
+        public Optional<DateTime> Timestamp { get; }
+        public Optional<string> Text { get; }
         public ITelegramChat Chat { get; }
+        public Optional<ITelegramUser> ForwardFrom { get; }
+        public Optional<ITelegramChat> ForwardFromChat { get; }
+        public Optional<IEnumerable<MessageCaption>> Captions { get; }
 
-        public ITelegramUser ForwardFrom { get; }
+        public Optional<int> ForwardFromMessageId { get; }
 
-        public ITelegramChat ForwardFromChat { get; }
+        public Optional<string> ForwardSignature { get; }
 
-        public IEnumerable<MessageCaption> Captions { get; }
+        public Optional<string> ForwardSenderName { get; }
 
+        public Optional<DateTime> ForwardDate { get; }
+
+        public Optional<ITelegramMessage> ReplyToMessage { get; }
+
+        public Optional<ITelegramUser> ViaBot { get; }
+
+        public Optional<DateTime> EditDate { get; }
+
+        public Optional<string> MediaGroupId { get; }
+
+        public Optional<string> AuthorSignature { get; }
+
+        public Optional<IEnumerable<MessageCaption>> Entities { get; }
+        
         public Task<bool> DeleteAsync();
     }
 }

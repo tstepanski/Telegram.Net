@@ -13,7 +13,9 @@ namespace TelegramNet.Entities
 
         public override string ToString()
         {
-            return $"@{_user.Username.ToLower()}";
+            if(_user.Username.HasValue)
+                return $"@{_user.Username.Value}";
+            return $"@{_user.FirstName}";
         }
     }
 }

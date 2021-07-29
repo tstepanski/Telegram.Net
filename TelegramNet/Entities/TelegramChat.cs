@@ -1,9 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using TelegramNet.Entities.Interfaces;
+using TelegramNet.ExtraTypes;
 using TelegramNet.Helpers;
-using TelegramNet.Services;
 using TelegramNet.Types;
 
 namespace TelegramNet.Entities
@@ -12,16 +13,25 @@ namespace TelegramNet.Entities
     {
         internal TelegramChat(BaseTelegramClient client, Chat chat)
         {
-            #region ~Realization of entity
+            if (chat != null)
+            {
+                #region ~Realization of entity
 
-            Id = chat.Id;
-            Type = chat.Type ?? string.Empty;
-            Title = chat.Title ?? string.Empty;
-            Username = chat.Username ?? string.Empty;
-            FirstName = chat.FirstName ?? string.Empty;
-            LastName = chat.LastName ?? string.Empty;
+                Id = chat.Id;
+                Type = chat.Type ?? string.Empty;
+                Title = chat.Title ?? string.Empty;
+                Username = chat.Username ?? string.Empty;
+                FirstName = chat.FirstName ?? string.Empty;
+                LastName = chat.LastName ?? string.Empty;
 
-            #endregion
+                #endregion    
+            }
+            else
+            {
+                throw new InvalidOperationException(GitHubIssueBuilder.Message(
+                    $"Exception while initializing {nameof(TelegramChat)}.", nameof(InvalidOperationException),
+                    $"**Description:**\nDescribe your problem here.\n**StackTrace:**\n{Environment.StackTrace}"));
+            }
 
             _tgClient = client;
             _client = client.TelegramApi;
@@ -32,19 +42,17 @@ namespace TelegramNet.Entities
 
         public ChatId Id { get; }
         public string Type { get; }
-        public string Title { get; }
-        public string Username { get; }
-        public string FirstName { get; }
-        public string LastName { get; }
+        public Optional<string> Title { get; }
+        public Optional<string> Username { get; }
+        public Optional<string> FirstName { get; }
+        public Optional<string> LastName { get; }
 
         public async Task<TelegramClientMessage> SendMessageAsync(string text)
         {
-            var parseAble = int.TryParse(Id.Id, out var id);
-
             var message = await _client.RequestAsync<Message>("sendMessage", HttpMethod.Post,
                 new Dictionary<string, object>
                 {
-                    {"chat_id", parseAble ? id : Id.Id},
+                    {"chat_id", Id.Fetch()},
                     {"text", text}
                 }.ToJson());
 

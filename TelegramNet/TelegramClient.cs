@@ -1,14 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using TelegramNet.Entities;
-using TelegramNet.Entities.Interfaces;
-using TelegramNet.Events;
 using TelegramNet.Helpers;
-using TelegramNet.Services;
-using TelegramNet.Services.HTTP;
-using TelegramNet.Services.HTTP.Entities;
+using TelegramNet.Services.Http;
+using TelegramNet.Services.Http.Entities;
 using TelegramNet.Services.ReceivingUpdates;
 using TelegramNet.Types;
 
@@ -24,7 +20,7 @@ namespace TelegramNet
 
         #region ~DELEGATES~
 
-        public delegate Task MessageActionHandler(ITelegramUser sender, TelegramMessage message);
+        public delegate Task MessageActionHandler(TelegramMessage message);
 
         #endregion
 
@@ -42,25 +38,25 @@ namespace TelegramNet
                 if (update.Message != null)
                 {
                     var mess = new TelegramMessage(this, update.Message);
-                    OnMessageReceived?.Invoke(mess.Author, mess);
+                    OnMessageReceived?.Invoke(mess);
                 }
 
                 if (update.EditedMessage != null)
                 {
                     var mess = new TelegramMessage(this, update.EditedMessage);
-                    OnMessageEdited?.Invoke(mess.Author, mess);
+                    OnMessageEdited?.Invoke(mess);
                 }
 
                 if (update.ChannelPost != null)
                 {
                     var mess = new TelegramMessage(this, update.ChannelPost);
-                    OnChannelPost?.Invoke(mess.Author, mess);
+                    OnChannelPost?.Invoke(mess);
                 }
 
                 if (update.EditedChannelPost != null)
                 {
                     var mess = new TelegramMessage(this, update.EditedChannelPost);
-                    OnChannelPostEdited?.Invoke(mess.Author, mess);
+                    OnChannelPostEdited?.Invoke(mess);
                 }
             }
         }
@@ -69,9 +65,6 @@ namespace TelegramNet
 
         #endregion
 
-        /// <inheritdoc/>
-        internal override TelegramApiClient TelegramApi { get; }
-
         public TelegramClient(string token)
         {
             _worker = new UpdatingWorker(this);
@@ -79,6 +72,8 @@ namespace TelegramNet
             TelegramApi = new TelegramApiClient(this);
             ExtClient = new TelegramExtensionClient(this);
         }
+
+        #region ~PROPERTIES~
 
         /// <inheritdoc/>
         public override SelfUser Me
@@ -90,6 +85,13 @@ namespace TelegramNet
                 return me.Ok ? new SelfUser(this, me.Result.Value) : null;
             }
         }
+
+        /// <inheritdoc/>
+        internal override TelegramApiClient TelegramApi { get; }
+
+        #endregion
+
+        #region ~RECEIVERS~
 
         /// <inheritdoc/>
         public override void Start()
@@ -107,6 +109,10 @@ namespace TelegramNet
             _worker.StopUpdatingThread();
         }
 
+        #endregion
+
+        #region ~INTERNALS~
+
         internal async Task<RequestResult<T>> ExecuteMethodAsync<T>(string methodName, HttpMethod method,
             string json = null)
         {
@@ -118,15 +124,32 @@ namespace TelegramNet
             return await _requester.ExecuteMethodAsync(methodName, method, json);
         }
 
+        #endregion
+
+
+        #region ~METHODS~
+
         public async Task<TelegramChat> GetChatAsync(ChatId chat)
         {
-            var parseAble = int.TryParse(chat.Id, out var id);
-
-            return new TelegramChat(this, await TelegramApi.RequestAsync<Chat>("getChat", HttpMethod.Get,
+            return new(this, await TelegramApi.RequestAsync<Chat>("getChat", HttpMethod.Get,
                 new Dictionary<string, object>
                 {
-                    {"chat_id", parseAble ? id : chat.Id}
+                    {"chat_id", chat.Fetch()}
                 }.ToJson()));
         }
+
+        public async Task<TelegramClientMessage> SendMessageAsync(ChatId chat, string text)
+        {
+            var message = await TelegramApi.RequestAsync<Message>("sendMessage", HttpMethod.Post,
+                new Dictionary<string, object>
+                {
+                    {"chat_id", chat.Fetch()},
+                    {"text", text}
+                }.ToJson());
+
+            return new TelegramClientMessage(this, message);
+        }
+        
+        #endregion
     }
 }

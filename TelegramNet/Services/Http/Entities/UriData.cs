@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace TelegramNet.Services.HTTP.Entities
+namespace TelegramNet.Services.Http.Entities
 {
     public class UriData
     {

@@ -1,7 +1,6 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using TelegramNet.Helpers;
-using TelegramNet.Services;
 using TelegramNet.Types;
 
 namespace TelegramNet.Entities
@@ -14,13 +13,12 @@ namespace TelegramNet.Entities
         }
 
         private readonly TelegramApiClient _client;
-
-        public async Task<bool> EditAsync(MessageEditor editor)
+        
+        public async Task<bool> EditTextAsync(MessageTextEditor textEditor)
         {
-            // editor.Validation();
-            editor.ChatId = int.Parse(Chat.Id.Id);
-            editor.MessageId = Id;
-            var json = editor.ToJson();
+            textEditor.ChatId = Chat.Id;
+            textEditor.MessageId = Id;
+            var json = textEditor.ToJson();
 
             var result = await _client.RequestAsync("editMessageText", HttpMethod.Post, json);
 

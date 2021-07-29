@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using TelegramNet.ExtraTypes;
 
 namespace TelegramNet.Entities.Interfaces
 {
@@ -8,13 +9,13 @@ namespace TelegramNet.Entities.Interfaces
 
         public string Type { get; }
 
-        public string Title { get; }
+        public Optional<string> Title { get; }
 
-        public string Username { get; }
+        public Optional<string> Username { get; }
 
-        public string FirstName { get; }
+        public Optional<string> FirstName { get; }
 
-        public string LastName { get; }
+        public Optional<string> LastName { get; }
 
         public Task<TelegramClientMessage> SendMessageAsync(string text);
     }

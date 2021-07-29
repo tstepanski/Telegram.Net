@@ -9,7 +9,7 @@ namespace TelegramNet.ExtraTypes
             return HashCode.Combine(value, HasValue);
         }
 
-        public bool HasValue { get; private set; }
+        public bool HasValue { get; }
         private T value;
 
         public T Value
@@ -25,8 +25,16 @@ namespace TelegramNet.ExtraTypes
 
         public Optional(T value)
         {
-            this.value = value;
-            HasValue = true;
+            if (value != null)
+            {
+                this.value = value;
+                HasValue = true;    
+            }
+            else
+            {
+                this.value = value;
+                HasValue = false;
+            }
         }
 
         public static explicit operator T(Optional<T> optional)
@@ -36,23 +44,26 @@ namespace TelegramNet.ExtraTypes
 
         public static implicit operator Optional<T>(T value)
         {
-            return new(value);
+            if (value != null)
+                return new(value);
+            
+            return new Optional<T>(default);
         }
 
         public override bool Equals(object obj)
         {
             if (obj is Optional<T>)
                 return Equals((Optional<T>) obj);
-            else
-                return false;
+            
+            return false;
         }
 
         public bool Equals(Optional<T> other)
         {
             if (HasValue && other.HasValue)
                 return Equals(value, other.value);
-            else
-                return HasValue == other.HasValue;
+            
+            return HasValue == other.HasValue;
         }
 
         public static bool operator ==(Optional<T> left, Optional<T> right)

@@ -4,9 +4,9 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using TelegramNet.Services.HTTP.Entities;
+using TelegramNet.Services.Http.Entities;
 
-namespace TelegramNet.Services.HTTP
+namespace TelegramNet.Services.Http
 {
     public class HttpRequester
     {
