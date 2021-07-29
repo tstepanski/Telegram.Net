@@ -24,6 +24,8 @@
 await chat.SendMessageAsync("This is my first message! Yeah 👏"); //Realy easy!
 ```
 
+<h2>
+
 <h1 align="center">
     🚀 Quick start 🚀
 </h1>
@@ -59,11 +61,62 @@ If you want stop receiving:
 client.Stop();
 ```
 
-Full code:
+<h2>
+💻 Full code:
+</h2>
 
 ```csharp
 var client = new TelegramClient("<YOUR_SECRET_TOKEN_HERE>");
 var me = client.Me;
 
 Console.WriteLine(me);
+client.Start();
+
+Console.WriteLine("Press any key to stop bot.");
+Console.ReadKey();
+client.Stop();
 ```
+
+<h2 align="center">Congrats! You created your first bot! 🥳</h2>
+
+<h1 align="center">
+🤫 More intersting features 🤫
+</h1>
+
+So, we started our fist bot, nice. But our bot can't do anything! Let's create simple repeater bot.
+
+```csharp
+namespace TheBestBotEverCreated
+{
+    public class Programm
+    {
+        public static void Main(string[] args)
+        {
+            var client = new TelegramClient("<YOUR_SECRET_TOKEN_HERE>");
+            var me = client.Me;
+
+            Console.WriteLine(me);
+            client.Start();
+
+            client.OnMessageReceived += OnMessage;
+
+            Console.WriteLine("Press any key to stop bot.");
+            Console.ReadKey();
+            client.Stop();
+        }
+
+        public async Task OnMessage(ITelegramUser sender, TelegramMessage message)
+        {
+            var chat = message.Chat;
+
+            await chat.SendMessageAsync(message.Text);
+        }
+    }
+}
+```
+
+<p align="center">
+    <img src="Images/RepeatResult.png" width="500">
+</p>
+
+Also you can install special [command framework]() as extension for your project.
