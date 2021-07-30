@@ -3,7 +3,7 @@ using TelegramNet.Types.Extras;
 
 namespace TelegramNet.Types.Inlines
 {
-    public class InlineKeyboardButton
+    internal class InlineKeyboardButton
     {
         [JsonPropertyName("text")]
         public string Text { get; set; }
