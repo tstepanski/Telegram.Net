@@ -5,7 +5,6 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TelegramNet.Entities.Interfaces;
-using TelegramNet.Entities.Keyboards;
 using TelegramNet.Entities.Keyboards.Inlines;
 using TelegramNet.ExtraTypes;
 using TelegramNet.Helpers;
