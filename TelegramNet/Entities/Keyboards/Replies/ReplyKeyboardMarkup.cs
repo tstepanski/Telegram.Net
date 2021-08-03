@@ -72,7 +72,6 @@ namespace TelegramNet.Entities.Keyboards.Replies
     public enum PollType
     {
         Quiz = 0,
-        Regular = 1,
-        None = 2
+        Regular = 1
     }
 }

@@ -6,9 +6,11 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using TelegramNet.Entities.Interfaces;
 using TelegramNet.Entities.Keyboards.Inlines;
+using TelegramNet.Entities.Keyboards.Replies;
 using TelegramNet.ExtraTypes;
 using TelegramNet.Helpers;
 using TelegramNet.Types;
+using ReplyKeyboardMarkup = TelegramNet.Types.Replies.ReplyKeyboardMarkup;
 
 namespace TelegramNet.Entities
 {
@@ -97,6 +99,25 @@ namespace TelegramNet.Entities
                     // ignored
                 }
 
+                try
+                {
+                    var but = JsonSerializer.Deserialize<ReplyKeyboardMarkup>(serializedButtons);
+
+                    if (but != null)
+                        ReplyKeyboardMarkup = new Keyboards.Replies.ReplyKeyboardMarkup(but.Keyboard.Select(x => x
+                                    .Select(z => new KeyboardButton(z.Text,
+                                        z.RequestContact,
+                                        z.RequestLocation,
+                                        new KeyboardButtonPollType(z.RequestPoll.Type)))
+                                    .ToArray())
+                                .ToArray(), but.ResizeKeyboard, but.OneTimeKeyboard, but.InputFieldPlaceHolder,
+                            but.Selective);
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+                
                 #endregion
             }
             else
@@ -151,6 +172,8 @@ namespace TelegramNet.Entities
 
         public InlineKeyboardButton[][] InlineKeyboardMarkups { get; }
 
+        public TelegramNet.Entities.Keyboards.Replies.ReplyKeyboardMarkup ReplyKeyboardMarkup { get; }
+        
         public async Task<bool> DeleteAsync()
         {
             var result = await _client.RequestAsync("deleteMessage", HttpMethod.Post, new Dictionary<string, object>

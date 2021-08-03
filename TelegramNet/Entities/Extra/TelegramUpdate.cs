@@ -30,9 +30,11 @@ namespace TelegramNet.Entities.Extra
         internal static TelegramUpdate FromUpdate(BaseTelegramClient client, Update update)
         {
             return new(
-                update.UpdateId, new TelegramMessage(client, update.Message),
-                new TelegramMessage(client, update.EditedMessage), new TelegramMessage(client, update.ChannelPost),
-                new TelegramMessage(client, update.EditedChannelPost));
+                update.UpdateId,
+                update.Message != null ? new TelegramMessage(client, update.Message) : null,
+                update.EditedMessage != null ? new TelegramMessage(client, update.EditedMessage) : null,
+                update.ChannelPost != null ? new TelegramMessage(client, update.ChannelPost) : null,
+                update.EditedChannelPost != null ? new TelegramMessage(client, update.EditedChannelPost) : null);
         }
     }
 }
