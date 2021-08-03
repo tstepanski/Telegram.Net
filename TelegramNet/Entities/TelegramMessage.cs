@@ -2,8 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using TelegramNet.Entities.Interfaces;
+using TelegramNet.Entities.Keyboards;
+using TelegramNet.Entities.Keyboards.Inlines;
 using TelegramNet.ExtraTypes;
 using TelegramNet.Helpers;
 using TelegramNet.Types;
@@ -71,28 +74,60 @@ namespace TelegramNet.Entities
                         message.Text))
                     .ToArray();
 
+                var serializedButtons = message.ReplyMarkup.ToJson();
+
+                try
+                {
+                    var but = JsonSerializer.Deserialize<InlineObject>(serializedButtons);
+
+                    if (but != null)
+                        InlineKeyboardMarkups = but.inline_keyboard.Select(x => x.Select(z =>
+                                    new InlineKeyboardButton(z.Text,
+                                        new Uri(z.Url),
+                                        new LoginUri(z.LoginUrl.Url == null
+                                                ? new Uri(z.LoginUrl.Url ?? string.Empty)
+                                                : null,
+                                            z.LoginUrl.ForwardText,
+                                            z.LoginUrl.BotUsername,
+                                            z.LoginUrl.RequestWriteAccess)))
+                                .ToArray())
+                            .ToArray();
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
+
                 #endregion
             }
             else
             {
-               throw new InvalidOperationException(GitHubIssueBuilder.Message(
-                                   $"Exception while initializing {nameof(TelegramMessage)}.", nameof(InvalidOperationException),
-                                   $"**Description:**\nDescribe your problem here.\n**StackTrace:**\n{Environment.StackTrace}"));
+                throw new InvalidOperationException(GitHubIssueBuilder.Message(
+                    $"Exception while initializing {nameof(TelegramMessage)}.", nameof(InvalidOperationException),
+                    $"**Description:**\nDescribe your problem here.\n**StackTrace:**\n{Environment.StackTrace}"));
             }
-            
+
             _client = client.TelegramApi;
         }
 
         private readonly TelegramApiClient _client;
 
         public int Id { get; }
+
         public Optional<ITelegramUser> Author { get; }
+
         public Optional<ITelegramChat> SenderChat { get; }
+
         public Optional<DateTime> Timestamp { get; }
+
         public Optional<string> Text { get; }
+
         public ITelegramChat Chat { get; }
+
         public Optional<ITelegramUser> ForwardFrom { get; }
+
         public Optional<ITelegramChat> ForwardFromChat { get; }
+
         public Optional<IEnumerable<MessageCaption>> Captions { get; }
 
         public Optional<int> ForwardFromMessageId { get; }
@@ -115,6 +150,8 @@ namespace TelegramNet.Entities
 
         public Optional<IEnumerable<MessageCaption>> Entities { get; }
 
+        public InlineKeyboardButton[][] InlineKeyboardMarkups { get; }
+
         public async Task<bool> DeleteAsync()
         {
             var result = await _client.RequestAsync("deleteMessage", HttpMethod.Post, new Dictionary<string, object>
@@ -124,6 +161,11 @@ namespace TelegramNet.Entities
             }.ToJson());
 
             return result.Ok;
+        }
+
+        private class InlineObject
+        {
+            public Types.Inlines.InlineKeyboardButton[][] inline_keyboard { get; set; }
         }
     }
 }

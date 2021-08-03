@@ -13,9 +13,7 @@ namespace TelegramNet.Entities
 
         public override string ToString()
         {
-            if(_user.Username.HasValue)
-                return $"@{_user.Username.Value}";
-            return $"@{_user.FirstName}";
+            return _user.Username.HasValue ? $"@{_user.Username.Value}" : $"tg://user?id={_user.Id}";
         }
     }
 }

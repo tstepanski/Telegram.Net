@@ -37,7 +37,7 @@ namespace TelegramNet.Entities.Interfaces
         public Optional<string> AuthorSignature { get; }
 
         public Optional<IEnumerable<MessageCaption>> Entities { get; }
-        
+
         public Task<bool> DeleteAsync();
     }
 }

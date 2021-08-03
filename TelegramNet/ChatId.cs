@@ -16,20 +16,20 @@ namespace TelegramNet
 
         public bool TryFetchInteger(out int id)
         {
-            bool able = int.TryParse(Id, out id);
+            var able = int.TryParse(Id, out id);
 
             return able;
         }
 
         internal object Fetch()
         {
-            bool isInteger = TryFetchInteger(out int id);
+            var isInteger = TryFetchInteger(out var id);
 
             if (isInteger)
                 return id;
             return Id;
         }
-        
+
         public static implicit operator ChatId(string id)
         {
             return new(id);
@@ -42,7 +42,7 @@ namespace TelegramNet
 
         internal static ChatId FromObject(object obj)
         {
-            string value = obj.ToString();
+            var value = obj.ToString();
             return new ChatId(value);
         }
     }

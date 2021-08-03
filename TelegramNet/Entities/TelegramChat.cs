@@ -1,8 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading.Tasks;
 using TelegramNet.Entities.Interfaces;
+using TelegramNet.Entities.Keyboards.Inlines;
+using TelegramNet.Enums;
 using TelegramNet.ExtraTypes;
 using TelegramNet.Helpers;
 using TelegramNet.Types;
@@ -24,7 +24,7 @@ namespace TelegramNet.Entities
                 FirstName = chat.FirstName ?? string.Empty;
                 LastName = chat.LastName ?? string.Empty;
 
-                #endregion    
+                #endregion
             }
             else
             {
@@ -34,11 +34,9 @@ namespace TelegramNet.Entities
             }
 
             _tgClient = client;
-            _client = client.TelegramApi;
         }
 
         private readonly BaseTelegramClient _tgClient;
-        private readonly TelegramApiClient _client;
 
         public ChatId Id { get; }
         public string Type { get; }
@@ -47,16 +45,15 @@ namespace TelegramNet.Entities
         public Optional<string> FirstName { get; }
         public Optional<string> LastName { get; }
 
-        public async Task<TelegramClientMessage> SendMessageAsync(string text)
+        public async Task<TelegramClientMessage> SendMessageAsync(string text, ParseMode mode = ParseMode.MarkdownV2,
+            InlineKeyboardMarkup inlineMarkup = null,
+            Keyboards.Replies.ReplyKeyboardMarkup replyMarkup = null)
         {
-            var message = await _client.RequestAsync<Message>("sendMessage", HttpMethod.Post,
-                new Dictionary<string, object>
-                {
-                    {"chat_id", Id.Fetch()},
-                    {"text", text}
-                }.ToJson());
-
-            return new TelegramClientMessage(_tgClient, message);
+            return await _tgClient.SendMessageAsync(Id,
+                text,
+                mode,
+                inlineMarkup,
+                replyMarkup);
         }
     }
 }

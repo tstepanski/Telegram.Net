@@ -28,13 +28,18 @@ namespace TelegramNet.ExtraTypes
             if (value != null)
             {
                 this.value = value;
-                HasValue = true;    
+                HasValue = true;
             }
             else
             {
                 this.value = value;
                 HasValue = false;
             }
+        }
+
+        public T GetValueForce()
+        {
+            return !HasValue ? default : value;
         }
 
         public static explicit operator T(Optional<T> optional)
@@ -45,8 +50,8 @@ namespace TelegramNet.ExtraTypes
         public static implicit operator Optional<T>(T value)
         {
             if (value != null)
-                return new(value);
-            
+                return new Optional<T>(value);
+
             return new Optional<T>(default);
         }
 
@@ -54,7 +59,7 @@ namespace TelegramNet.ExtraTypes
         {
             if (obj is Optional<T>)
                 return Equals((Optional<T>) obj);
-            
+
             return false;
         }
 
@@ -62,7 +67,7 @@ namespace TelegramNet.ExtraTypes
         {
             if (HasValue && other.HasValue)
                 return Equals(value, other.value);
-            
+
             return HasValue == other.HasValue;
         }
 

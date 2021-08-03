@@ -1,8 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.Net.Http;
 using System.Threading.Tasks;
 using TelegramNet.Entities.Interfaces;
+using TelegramNet.Entities.Keyboards;
+using TelegramNet.Entities.Keyboards.Inlines;
+using TelegramNet.Entities.Keyboards.Replies;
+using TelegramNet.Enums;
 using TelegramNet.ExtraTypes;
 using TelegramNet.Helpers;
 using TelegramNet.Types;
@@ -27,7 +29,7 @@ namespace TelegramNet.Entities
                 CanReadAllGroupMessages = user.CanReadAllGroupMessages;
                 SupportsInlineQueries = user.SupportsInlineQueries;
 
-                #endregion    
+                #endregion
             }
             else
             {
@@ -38,11 +40,9 @@ namespace TelegramNet.Entities
 
             Mention = new UserMention(this);
             _tgClient = client;
-            _client = client.TelegramApi;
         }
 
         private readonly BaseTelegramClient _tgClient;
-        private readonly TelegramApiClient _client;
 
         public int Id { get; }
         public bool IsBot { get; }
@@ -55,16 +55,16 @@ namespace TelegramNet.Entities
         public Optional<bool> SupportsInlineQueries { get; }
         public UserMention Mention { get; }
 
-        public async Task<ITelegramMessage> SendPrivateMessageAsync(string text)
+        public async Task<TelegramClientMessage> SendMessageAsync(string text,
+            ParseMode parseMode = ParseMode.MarkdownV2,
+            InlineKeyboardMarkup inlineMarkup = null,
+            ReplyKeyboardMarkup replyMarkup = null)
         {
-            var message = await _client.RequestAsync<Message>("sendMessage", HttpMethod.Post,
-                new Dictionary<string, object>
-                {
-                    {"chat_id", Id},
-                    {"text", text}
-                }.ToJson());
-
-            return new TelegramMessage(_tgClient, message);
+            return await _tgClient.SendMessageAsync(Id,
+                text,
+                parseMode,
+                inlineMarkup,
+                replyMarkup);
         }
 
         public override string ToString()

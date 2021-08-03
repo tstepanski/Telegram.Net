@@ -35,7 +35,7 @@ namespace TelegramNet.Entities
 
             if (entity.User != null)
                 User = new TelegramUser(client, entity.User);
-            
+
             if (entity.Url != null)
                 Url = new Uri(entity.Url);
 
@@ -46,11 +46,11 @@ namespace TelegramNet.Entities
         public MessageCaptionType Type { get; }
 
         public string Content { get; }
-        
+
         public Optional<TelegramUser> User { get; }
 
         public Optional<Uri> Url { get; }
-        
+
         public Optional<string> Language { get; }
     }
 }

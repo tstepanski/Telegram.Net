@@ -12,19 +12,17 @@ namespace TelegramNet.Helpers
             get => ChatId.FromObject(ChatIndeficator);
             set => ChatIndeficator = value.Fetch();
         }
-        
-        [JsonPropertyName("chat_id")] internal object ChatIndeficator { get; set; }
 
-        [JsonPropertyName("message_id")] internal int MessageId { get; set; }
+        [JsonPropertyName("chat_id")] public object ChatIndeficator { get; internal set; }
+
+        [JsonPropertyName("message_id")] public int MessageId { get; internal set; }
 
         [JsonPropertyName("inline_message_id")]
-        internal string InlineMessageId { get; set; }
+        public string InlineMessageId { get; internal set; }
 
-        [JsonPropertyName("text")]
-        public string Text { get; set; }
+        [JsonPropertyName("text")] public string Text { get; set; }
 
-        [JsonPropertyName("parse_mode")]
-        public string ParseMode { get; set; } = "MarkdownV2";
+        [JsonPropertyName("parse_mode")] public string ParseMode { get; set; } = "MarkdownV2";
 
         [JsonPropertyName("disable_web_page_preview")]
         public bool DisableWebPagePreview { get; set; }
