@@ -5,6 +5,7 @@ namespace TelegramNet.Extensions.Base
 {
     public abstract class Extension
     {
-        public abstract Task SetupAsync(TelegramExtensionClient extensionClient, IServiceProvider provider);
+        public abstract Task SetupAsync(BaseTelegramClient client, TelegramExtensionClient extensionClient,
+            IServiceProvider provider);
     }
 }
