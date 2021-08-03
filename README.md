@@ -30,7 +30,7 @@ await chat.SendMessageAsync("This is my first message! Yeah 👏"); //Realy easy
     🚀 Quick start 🚀
 </h1>
 
-First, we should initialize new instance of `TelegramClient` like this:
+First, we should initialize a new instance of `TelegramClient` like this:
 
 ```csharp
 var client = new TelegramClient("<YOUR_SECRET_TOKEN_HERE>");
@@ -61,6 +61,8 @@ If you want stop receiving:
 client.Stop();
 ```
 
+---
+
 <h2>
 💻 Full code:
 </h2>
@@ -77,7 +79,9 @@ Console.ReadKey();
 client.Stop();
 ```
 
-<h2 align="center"> Congrats! You created your first bot! 🥳 </h2>
+## <h2 align="center"> Congrats! You've created your first bot! 🥳 </h2>
+
+---
 
 <h1 align="center">
 🤫 More interesting features 🤫
@@ -118,5 +122,3 @@ namespace TheBestBotEverCreated
 <p align="center">
     <img src="Images/RepeatResult.png" width="500">
 </p>
-
-Also you can install special [command framework]() as extension for your project.
