@@ -67,11 +67,4 @@ namespace TelegramNet.Entities.Keyboards.Replies
             };
         }
     }
-
-
-    public enum PollType
-    {
-        Quiz = 0,
-        Regular = 1
-    }
 }

@@ -14,9 +14,4 @@ namespace TelegramNet.Types.Replies
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public KeyboardButtonPollType RequestPoll { get; set; }
     }
-
-    internal class KeyboardButtonPollType
-    {
-        [JsonPropertyName("type")] public string Type { get; set; }
-    }
 }

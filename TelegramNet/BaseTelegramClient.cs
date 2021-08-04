@@ -3,8 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using TelegramNet.Entities;
 using TelegramNet.Entities.Extra;
-using TelegramNet.Entities.Keyboards;
 using TelegramNet.Entities.Keyboards.Inlines;
+using TelegramNet.Entities.Keyboards.Replies;
 using TelegramNet.Enums;
 using TelegramNet.Extensions.Base;
 using TelegramNet.Services.ReceivingUpdates;
@@ -24,6 +24,8 @@ namespace TelegramNet
         {
             TelegramApi = new TelegramApiClient(token);
             _worker = new UpdatingWorker(this);
+            
+            Console.Write(Constants.TelegramNetLogo);
         }
 
         internal TelegramApiClient TelegramApi { get; }
@@ -94,9 +96,22 @@ namespace TelegramNet
         /// <param name="markup">An inline markup.</param>
         /// <param name="replyMarkup">A reply markup. The markup will send if <see cref="markup"/> is null.</param>
         /// <returns>The message, which was sent.</returns>
-        public abstract Task<TelegramClientMessage> SendMessageAsync(ChatId chat, string text,
-            ParseMode mode = ParseMode.MarkdownV2, InlineKeyboardMarkup markup = null,
-            Entities.Keyboards.Replies.ReplyKeyboardMarkup replyMarkup = null);
+        public abstract Task<TelegramClientMessage> SendMessageAsync(ChatId chat,
+            string text,
+            ParseMode mode = ParseMode.MarkdownV2,
+            InlineKeyboardMarkup markup = null,
+            ReplyKeyboardMarkup replyMarkup = null);
+
+        // public abstract Task<TelegramClientMessage> SendDocumentAsync(ChatId id,
+        //     Uri fileUrl,
+        //     Uri thumbUri = null,
+        //     string caption = null,
+        //     ParseMode parseMode = ParseMode.MarkdownV2,
+        //     bool disableNotification = false,
+        //     int replyToMessageId = default,
+        //     bool allowSendingWithoutReply = false,
+        //     InlineKeyboardMarkup inlineMarkup = null,
+        //     ReplyKeyboardMarkup replyMarkup = null);
 
         public delegate Task OnUpdateHandler(TelegramUpdate[] updates);
 

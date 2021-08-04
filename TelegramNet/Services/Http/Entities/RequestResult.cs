@@ -14,13 +14,13 @@ namespace TelegramNet.Services.Http.Entities
             if (Ok) Result = new Optional<T>(JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(result.Result)));
         }
 
-        public bool Ok { get; }
+        public bool Ok { get; internal init; }
 
-        public Optional<string> Description { get; }
+        public Optional<string> Description { get; internal init; }
 
-        public Optional<int> ErrorCode { get; }
+        public Optional<int> ErrorCode { get; internal init; }
 
-        public Optional<T> Result { get; }
+        public Optional<T> Result { get; internal init; }
 
         public bool IsSuccess()
         {

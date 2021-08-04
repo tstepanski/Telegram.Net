@@ -1,9 +1,11 @@
 ﻿using System;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using TelegramNet.Logging;
 using TelegramNet.Services.Http.Entities;
 
 namespace TelegramNet.Services.Http
@@ -46,6 +48,7 @@ namespace TelegramNet.Services.Http
             }
             catch (Exception e)
             {
+                Logger.Log($"Failed executing {methodName}.", LogSource.Error);
                 return new HttpResult {Ok = false, Description = $"EXCEPTION\n{e}"};
             }
         }
@@ -68,6 +71,7 @@ namespace TelegramNet.Services.Http
             }
             catch (Exception e)
             {
+                Logger.Log($"Failed executing method by uri {data.Build(_token)}.", LogSource.Error);
                 return new HttpResult {Ok = false, Description = $"EXCEPTION\n{e}"};
             }
         }
@@ -104,6 +108,7 @@ namespace TelegramNet.Services.Http
             }
             catch (Exception e)
             {
+                Logger.Log($"Failed executing {methodName}", LogSource.Error);
                 return new HttpResult {Ok = false, Description = $"EXCEPTION\n{e}"};
             }
         }
@@ -132,6 +137,7 @@ namespace TelegramNet.Services.Http
             }
             catch (Exception e)
             {
+                Logger.Log($"Failed executing method by uri {data.Build(_token)}.", LogSource.Error);
                 return new HttpResult {Ok = false, Description = $"EXCEPTION\n{e}"};
             }
         }

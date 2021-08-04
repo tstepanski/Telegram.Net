@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using TelegramNet.Helpers;
+using TelegramNet.Logging;
 
 namespace TelegramNet.Services.ReceivingUpdates
 {
@@ -21,6 +22,7 @@ namespace TelegramNet.Services.ReceivingUpdates
 
         public void StartUpdatingThread(UpdateConfig config, Action<Update[]> onUpdate)
         {
+            bool pongReqNeed = true;
             _stop = false;
             _thr = new Thread(async () =>
             {
@@ -32,10 +34,21 @@ namespace TelegramNet.Services.ReceivingUpdates
 
                     if (response != null)
                     {
+                        if (pongReqNeed)
+                        {
+                            Logger.Log($"First update response got. Count: {response.Length}.", LogSource.TelegramApiServer);
+                            pongReqNeed = false;
+                        }
+                        
                         if (response.Length > 0)
                             lastId = response.Select(x => x.UpdateId).OrderByDescending(x => x).First();
 
                         onUpdate?.Invoke(response);
+                    }
+                    else
+                    {
+                        Logger.Log("Telegram API server is unavailable now.", LogSource.Warn);
+                        pongReqNeed = false;
                     }
 
                     Thread.Sleep(TimeSpan.FromSeconds(1));

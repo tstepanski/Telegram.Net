@@ -6,6 +6,7 @@ using TelegramNet.Entities.Extra;
 using TelegramNet.Entities.Keyboards.Inlines;
 using TelegramNet.Enums;
 using TelegramNet.Helpers;
+using TelegramNet.Logging;
 using TelegramNet.Services.Http;
 using TelegramNet.Types;
 
@@ -16,11 +17,12 @@ namespace TelegramNet
     /// </summary>
     public class TelegramClient : BaseTelegramClient
     {
-        public TelegramClient(string token) : base(token)
+        public TelegramClient(string token, bool loggingToConsole = false) : base(token)
         {
             _requester = new HttpRequester(token);
             ExtClient = new TelegramExtensionClient(this);
 
+            Logger.UseConsole(loggingToConsole);
             OnUpdateReceived += OnUpdate;
         }
 
@@ -136,7 +138,8 @@ namespace TelegramNet
 
             return new TelegramClientMessage(this, message, mode);
         }
-
+        
+        
         #endregion
     }
 }

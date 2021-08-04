@@ -9,6 +9,11 @@ namespace TelegramNet.ExtraTypes
             return HashCode.Combine(value, HasValue);
         }
 
+        public override string ToString()
+        {
+            return $"{(HasValue ? value.ToString() : "NoVal")}";
+        }
+
         public bool HasValue { get; }
         private T value;
 

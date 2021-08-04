@@ -30,7 +30,8 @@ namespace TelegramNet.Entities
                 "code" => MessageCaptionType.Code,
                 "pre" => MessageCaptionType.Pre,
                 "text_link" => MessageCaptionType.TextLink,
-                "text_mention" => MessageCaptionType.TextMention
+                "text_mention" => MessageCaptionType.TextMention,
+                _ => throw new ArgumentOutOfRangeException()
             };
 
             if (entity.User != null)
