@@ -6,6 +6,8 @@
     Hey! This is new Telegram API wrapper for .NET!
 </p>
 
+![CI](https://github.com/denvot/TelegramNet/actions/workflows/dotnet.yml/badge.svg)
+
 <h2>
    🧰 Tech info 
 </h2>
