@@ -20,8 +20,8 @@ namespace TelegramNet.Entities.Interfaces
         public Optional<string> LastName { get; }
 
         public Task<TelegramClientMessage> SendMessageAsync(string text,
-            ParseMode mode,
-            InlineKeyboardMarkup inlineMarkup,
+            ParseMode mode = ParseMode.MarkdownV2,
+            InlineKeyboardMarkup inlineMarkup = null,
             Keyboards.Replies.ReplyKeyboardMarkup replyMarkup = null);
     }
 }

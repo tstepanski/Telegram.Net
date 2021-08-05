@@ -22,8 +22,8 @@ namespace TelegramNet.Entities.Interfaces
         public UserMention Mention { get; }
 
         public Task<TelegramClientMessage> SendMessageAsync(string text,
-            ParseMode mode,
-            InlineKeyboardMarkup inlineMarkup,
-            ReplyKeyboardMarkup replyMarkup);
+            ParseMode mode = ParseMode.MarkdownV2,
+            InlineKeyboardMarkup inlineMarkup = null,
+            ReplyKeyboardMarkup replyMarkup = null);
     }
 }
