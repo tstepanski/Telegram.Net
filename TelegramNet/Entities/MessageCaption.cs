@@ -31,7 +31,7 @@ namespace TelegramNet.Entities
                 "pre" => MessageCaptionType.Pre,
                 "text_link" => MessageCaptionType.TextLink,
                 "text_mention" => MessageCaptionType.TextMention,
-                _ => throw new ArgumentOutOfRangeException()
+                _ => MessageCaptionType.Unknown
             };
 
             if (entity.User != null)

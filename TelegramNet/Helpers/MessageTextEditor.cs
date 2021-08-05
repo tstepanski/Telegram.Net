@@ -39,7 +39,7 @@ namespace TelegramNet.Helpers
             {
                 Enums.ParseMode.MarkdownV2 => "MarkdownV2",
                 Enums.ParseMode.Html => "HTML",
-                _ => throw new ArgumentOutOfRangeException(nameof(mode), mode, null)
+                _ => "MarkdownV2"
             };
             return this;
         }

@@ -4,13 +4,13 @@ using TelegramNet.ExtraTypes;
 
 namespace TelegramNet.Logging
 {
-    internal static class Logger
+    public static class Logger
     {
         public static event Func<LogMessage, Task> OnMessage;
         
         private static bool _useConsole;
         
-        public static void UseConsole(bool use)
+        internal static void UseConsole(bool use)
         {
             _useConsole = use;
         }
@@ -60,7 +60,7 @@ namespace TelegramNet.Logging
         }
     }
 
-    internal class LogMessage
+    public class LogMessage
     {
         public string Message { get; init; }
         
