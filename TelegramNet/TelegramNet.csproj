@@ -2,6 +2,14 @@
 
     <PropertyGroup>
         <TargetFrameworks>net5.0;</TargetFrameworks>
+        <PackageId>TelegramDotNet</PackageId>
+        <PackageVersion>0.5.0</PackageVersion>
+        <Title>Telegram.NET</Title>
+        <Authors>DenVot</Authors>
+        <Copyright>Copyright 2021 DenVot</Copyright>
+        <PackageLicenseUrl>https://github.com/DenVot/Telegram.Net/blob/master/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/DenVot/Telegram.Net</RepositoryUrl>
+        <PackageTags>Telegram; API; Telegram API wrapper; Bot; Bots; Telegram bot;</PackageTags>
     </PropertyGroup>
 
 </Project>
