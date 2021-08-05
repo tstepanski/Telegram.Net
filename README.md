@@ -15,13 +15,13 @@ If you want to test it you can install NuGet package:
 `Package manager`:
 
 ```
-Install-Package TelegramDotNet -Version 0.5.0
+Install-Package TelegramDotNet -Version 0.5.3
 ```
 
 `.NET CLI`:
 
 ```
-dotnet add package TelegramDotNet --version 0.5.0
+dotnet add package TelegramDotNet --version 0.5.3
 ```
 
 <h2>
