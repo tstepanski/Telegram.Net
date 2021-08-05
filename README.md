@@ -6,7 +6,23 @@
     Hey! This is new Telegram API wrapper for .NET!
 </p>
 
-![CI](https://github.com/denvot/TelegramNet/actions/workflows/dotnet.yml/badge.svg)
+<p align="center">
+    <img src="https://github.com/denvot/TelegramNet/actions/workflows/dotnet.yml/badge.svg">
+</p>
+
+If you want to test it you can install NuGet package:
+
+`Package manager`:
+
+```
+Install-Package TelegramDotNet -Version 0.5.0
+```
+
+`.NET CLI`:
+
+```
+dotnet add package TelegramDotNet --version 0.5.0
+```
 
 <h2>
    🧰 Tech info 
@@ -27,6 +43,12 @@ await chat.SendMessageAsync("This is my first message! Yeah 👏"); //Realy easy
 ```
 
 <h2>
+
+<h1 align="center">
+    ✍️ Contributing ✍️
+</h1>
+
+If you want to contribute, the first thing you should do is clone this repository, create some cool stuff, create unit tests for this stuff, and create pull request.
 
 <h1 align="center">
     🚀 Quick start 🚀
@@ -111,7 +133,7 @@ namespace TheBestBotEverCreated
             client.Stop();
         }
 
-        public async Task OnMessage(ITelegramUser sender, TelegramMessage message)
+        public async Task OnMessage(TelegramMessage message)
         {
             var chat = message.Chat;
 
