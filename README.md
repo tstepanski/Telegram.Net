@@ -10,22 +10,18 @@
     <img src="https://github.com/denvot/TelegramNet/actions/workflows/dotnet.yml/badge.svg">
 </p>
 
-Other languages:
-
-- [Russian](Localizations/README.ru.md)
-
 If you want to test it you can install NuGet package:
 
 `Package manager`:
 
-```bash
-Install-Package TelegramDotNet -Version 0.5.0
+```
+Install-Package TelegramDotNet -Version 0.5.3
 ```
 
 `.NET CLI`:
 
-```bash
-dotnet add package TelegramDotNet --version 0.5.0
+```
+dotnet add package TelegramDotNet --version 0.5.3
 ```
 
 <h2>
