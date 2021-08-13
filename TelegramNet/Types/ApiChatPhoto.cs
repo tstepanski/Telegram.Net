@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace TelegramNet.Types
 {
-    internal class ChatPhoto
+    internal class ApiChatPhoto
     {
         [JsonPropertyName("small_file_id")] public string SmallFileId { get; set; }
 

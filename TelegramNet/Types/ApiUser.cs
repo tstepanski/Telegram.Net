@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace TelegramNet.Types
 {
-    internal class User
+    internal class ApiUser
     {
         [JsonPropertyName("id")] public int Id { get; set; }
         [JsonPropertyName("is_bot")] public bool IsBot { get; set; }

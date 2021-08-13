@@ -2,11 +2,11 @@ using System.Text.Json.Serialization;
 
 namespace TelegramNet.Types
 {
-    internal class Location
+    internal class ApiLocation
     {
-        public float Longitude { get; set; }
+        [JsonPropertyName("longitude")] public float Longitude { get; set; }
 
-        public float Latitude { get; set; }
+        [JsonPropertyName("latitude")] public float Latitude { get; set; }
 
         [JsonPropertyName("horizontal_accuracy")]
         public float HorizontalAccuracy { get; set; }

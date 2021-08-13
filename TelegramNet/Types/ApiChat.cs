@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace TelegramNet.Types
 {
-    internal class Chat
+    internal class ApiChat
     {
         [JsonPropertyName("id")] public int Id { get; set; }
 
@@ -16,7 +16,7 @@ namespace TelegramNet.Types
 
         [JsonPropertyName("last_name")] public string LastName { get; set; }
 
-        [JsonPropertyName("photo")] public ChatPhoto Photo { get; set; }
+        [JsonPropertyName("photo")] public ApiChatPhoto Photo { get; set; }
 
         [JsonPropertyName("bio")] public string Bio { get; set; }
 
@@ -24,9 +24,9 @@ namespace TelegramNet.Types
 
         [JsonPropertyName("invite_link")] public string InviteLink { get; set; }
 
-        [JsonPropertyName("pinned_message")] public Message PinnedMessage { get; set; }
+        [JsonPropertyName("pinned_message")] public ApiMessage PinnedApiMessage { get; set; }
 
-        [JsonPropertyName("permissions")] public ChatPermissions Permissions { get; set; }
+        [JsonPropertyName("permissions")] public ApiChatPermissions Permissions { get; set; }
 
         [JsonPropertyName("slow_mode_delay")] public int? SlowModeDelay { get; set; }
 
@@ -40,6 +40,6 @@ namespace TelegramNet.Types
 
         [JsonPropertyName("linked_chat_id")] public int? LinkedChatId { get; set; }
 
-        [JsonPropertyName("location")] public ChatLocation Location { get; set; }
+        [JsonPropertyName("location")] public ApiChatLocation Location { get; set; }
     }
 }
