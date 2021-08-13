@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace TelegramNet.Types
 {
-    internal class ChatPermissions
+    internal class ApiChatPermissions
     {
         [JsonPropertyName("can_send_messages")]
         public bool? CanSendMessages { get; set; }

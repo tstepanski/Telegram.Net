@@ -8,14 +8,13 @@ namespace TelegramNet.Entities.Interfaces
     public interface ITelegramMessage
     {
         public int Id { get; }
-
-        public Optional<ITelegramUser> Author { get; }
-        public Optional<ITelegramChat> SenderChat { get; }
+        public Optional<TelegramUser> Author { get; }
+        public Optional<TelegramChat> SenderChat { get; }
         public Optional<DateTime> Timestamp { get; }
         public Optional<string> Text { get; }
-        public ITelegramChat Chat { get; }
-        public Optional<ITelegramUser> ForwardFrom { get; }
-        public Optional<ITelegramChat> ForwardFromChat { get; }
+        public TelegramChat Chat { get; }
+        public Optional<TelegramUser> ForwardFrom { get; }
+        public Optional<TelegramChat> ForwardFromChat { get; }
         public Optional<IEnumerable<MessageCaption>> Captions { get; }
 
         public Optional<int> ForwardFromMessageId { get; }
@@ -26,9 +25,9 @@ namespace TelegramNet.Entities.Interfaces
 
         public Optional<DateTime> ForwardDate { get; }
 
-        public Optional<ITelegramMessage> ReplyToMessage { get; }
+        public Optional<TelegramMessage> ReplyToMessage { get; }
 
-        public Optional<ITelegramUser> ViaBot { get; }
+        public Optional<TelegramUser> ViaBot { get; }
 
         public Optional<DateTime> EditDate { get; }
 

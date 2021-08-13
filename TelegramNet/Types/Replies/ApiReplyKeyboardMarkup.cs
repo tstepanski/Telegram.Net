@@ -2,9 +2,9 @@ using System.Text.Json.Serialization;
 
 namespace TelegramNet.Types.Replies
 {
-    internal class ReplyKeyboardMarkup
+    internal class ApiReplyKeyboardMarkup
     {
-        [JsonPropertyName("keyboard")] public KeyboardButton[][] Keyboard { get; set; }
+        [JsonPropertyName("keyboard")] public ApiKeyboardButton[][] Keyboard { get; set; }
 
         [JsonPropertyName("resize_keyboard")] public bool ResizeKeyboard { get; set; }
 

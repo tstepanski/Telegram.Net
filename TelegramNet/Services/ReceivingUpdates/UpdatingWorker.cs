@@ -22,7 +22,7 @@ namespace TelegramNet.Services.ReceivingUpdates
 
         public void StartUpdatingThread(UpdateConfig config, Action<Update[]> onUpdate)
         {
-            bool pongReqNeed = true;
+            var pongReqNeed = true;
             _stop = false;
             _thr = new Thread(async () =>
             {
@@ -36,10 +36,11 @@ namespace TelegramNet.Services.ReceivingUpdates
                     {
                         if (pongReqNeed)
                         {
-                            Logger.Log($"First update response got. Count: {response.Length}.", LogSource.TelegramApiServer);
+                            Logger.Log($"First update response got. Count: {response.Length}.",
+                                LogSource.TelegramApiServer);
                             pongReqNeed = false;
                         }
-                        
+
                         if (response.Length > 0)
                             lastId = response.Select(x => x.UpdateId).OrderByDescending(x => x).First();
 

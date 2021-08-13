@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace TelegramNet.Types.Replies
 {
-    internal class KeyboardButton
+    internal class ApiKeyboardButton
     {
         [JsonPropertyName("text")] public string Text { get; set; }
 
@@ -12,6 +12,6 @@ namespace TelegramNet.Types.Replies
 
         [JsonPropertyName("request_poll")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public KeyboardButtonPollType RequestPoll { get; set; }
+        public ApiKeyboardButtonPollType RequestPoll { get; set; }
     }
 }

@@ -7,9 +7,9 @@ namespace TelegramNet.Logging
     public static class Logger
     {
         public static event Func<LogMessage, Task> OnMessage;
-        
+
         private static bool _useConsole;
-        
+
         internal static void UseConsole(bool use)
         {
             _useConsole = use;
@@ -55,6 +55,7 @@ namespace TelegramNet.Logging
                 default:
                     throw new ArgumentOutOfRangeException(nameof(source), source, null);
             }
+
             Console.ResetColor();
             Console.WriteLine(" " + message);
         }
@@ -63,9 +64,9 @@ namespace TelegramNet.Logging
     public class LogMessage
     {
         public string Message { get; init; }
-        
+
         public LogSource Source { get; init; }
-        
+
         public Optional<string> CustomSource { get; init; }
     }
 
@@ -75,7 +76,7 @@ namespace TelegramNet.Logging
         LocalServer,
         Custom,
         Info,
-        Warn, 
+        Warn,
         Error
     }
 }

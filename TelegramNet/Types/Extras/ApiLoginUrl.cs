@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace TelegramNet.Types.Extras
 {
-    internal class LoginUrl
+    internal class ApiLoginUrl
     {
         [JsonPropertyName("url")] public string Url { get; set; }
 

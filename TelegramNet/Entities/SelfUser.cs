@@ -4,7 +4,7 @@ namespace TelegramNet.Entities
 {
     public class SelfUser : TelegramUser
     {
-        internal SelfUser(BaseTelegramClient client, User user) : base(client, user)
+        internal SelfUser(BaseTelegramClient client, ApiUser user) : base(client, user)
         {
             SelfClient = client;
         }

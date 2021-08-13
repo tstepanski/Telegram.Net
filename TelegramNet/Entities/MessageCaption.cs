@@ -7,7 +7,7 @@ namespace TelegramNet.Entities
 {
     public class MessageCaption
     {
-        internal MessageCaption(BaseTelegramClient client, MessageEntity entity, string text)
+        internal MessageCaption(BaseTelegramClient client, ApiMessageEntity entity, string text)
         {
             var offset = entity.Offset;
             var length = entity.Length;

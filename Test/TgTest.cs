@@ -19,7 +19,7 @@ namespace Test
 
             Assert.IsNotNull(chat);
 
-            var mess = await chat.SendMessageAsync("hello");
+            var mess = await chat.SendMessageAsync(text: "hello");
 
             Assert.IsTrue(mess.Text == "hello");
         }
@@ -32,7 +32,7 @@ namespace Test
 
             Assert.IsNotNull(chat);
 
-            var mess = await chat.SendMessageAsync("hello");
+            var mess = await chat.SendMessageAsync(text: "hello");
 
             var edited = await mess.EditTextAsync(new MessageTextEditor().WithText("edited"));
 
@@ -44,11 +44,17 @@ namespace Test
         {
             var client = new TelegramClient("1710474838:AAG5g9lWry0hNYX0i-RAmjBSbNB47_D6s3g");
             var chat = await client.GetChatAsync(640800833);
-            
+
             Assert.IsNotNull(chat);
 
-            var mess = await chat.SendMessageAsync("Inline markup test", ParseMode.MarkdownV2, new InlineKeyboardMarkup(new [] { new InlineKeyboardButton("Inline test!", callbackData: "Callback") }));
-            
+            var mess = await chat.SendMessageAsync(text: "Inline markup test",
+                ParseMode.MarkdownV2,
+                new InlineKeyboardMarkup(new[]
+                {
+                    new InlineKeyboardButton("Inline test!",
+                        callbackData: "Callback")
+                }));
+
             Assert.IsNotNull(mess);
         }
 
@@ -57,18 +63,18 @@ namespace Test
         {
             var client = new TelegramClient("1710474838:AAG5g9lWry0hNYX0i-RAmjBSbNB47_D6s3g");
             var chat = await client.GetChatAsync(640800833);
-            
+
             Assert.IsNotNull(chat);
 
-            var mess = await chat.SendMessageAsync("Inline markup test",
+            var mess = await chat.SendMessageAsync(text: "Inline markup test",
                 ParseMode.MarkdownV2,
                 new InlineKeyboardMarkup(new[]
                 {
                     new InlineKeyboardButton("Inline test!",
                         callbackData: "Callback")
                 }));
-            
-            bool res = await mess.RemoveKeyboardAsync();
+
+            var res = await mess.RemoveKeyboardAsync();
             Assert.IsTrue(res);
         }
 
@@ -80,14 +86,14 @@ namespace Test
             var mess = await client.SendMessageAsync(640800833,
                 "Inline markup test",
                 ParseMode.MarkdownV2,
-                replyMarkup: new ReplyKeyboardMarkup(new[]
+                new ReplyKeyboardMarkup(new[]
                 {
                     new[]
                     {
                         new KeyboardButton("Test")
                     }
                 }));
-            
+
             Assert.IsNotNull(mess);
         }
 
@@ -99,7 +105,7 @@ namespace Test
             var mess = await client.SendMessageAsync(640800833,
                 "Reply markup test",
                 ParseMode.MarkdownV2,
-                replyMarkup: new ReplyKeyboardMarkup(ReplyKeyboardMarkup.Builder
+                new ReplyKeyboardMarkup(ReplyKeyboardMarkup.Builder
                     .AddRow(
                         ReplyKeyboardMarkup.RowBuilder
                             .WithButton("Hello")
@@ -107,20 +113,20 @@ namespace Test
                     .AddRow(
                         ReplyKeyboardMarkup.RowBuilder
                             .WithButton("Another row"))));
-            
+
             Assert.IsNotNull(mess);
 
             var mess1 = await client.SendMessageAsync(640800833,
                 "Inline markup test",
                 ParseMode.MarkdownV2,
-                new InlineKeyboardMarkup(InlineKeyboardMarkup.Builder
+                keyboard: new InlineKeyboardMarkup(InlineKeyboardMarkup.Builder
                     .AddRow(
                         InlineKeyboardMarkup.RowBuilder
                             .WithButton(new InlineKeyboardButton("First row", callbackData: "First row")))
                     .AddRow(
                         InlineKeyboardMarkup.RowBuilder
                             .WithButton(new InlineKeyboardButton("Second row", callbackData: "Second row")))));
-            
+
             Assert.IsNotNull(mess1);
         }
     }

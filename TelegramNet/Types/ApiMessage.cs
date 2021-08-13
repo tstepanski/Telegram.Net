@@ -3,17 +3,17 @@ using TelegramNet.Types.Inlines;
 
 namespace TelegramNet.Types
 {
-    internal class Message
+    internal class ApiMessage
     {
         [JsonPropertyName("message_id")] public int Id { get; set; }
-        [JsonPropertyName("from")] public User Author { get; set; }
-        [JsonPropertyName("sender_chat")] public Chat SenderChat { get; set; }
+        [JsonPropertyName("from")] public ApiUser Author { get; set; }
+        [JsonPropertyName("sender_chat")] public ApiChat SenderApiChat { get; set; }
         [JsonPropertyName("date")] public int Date { get; set; }
-        [JsonPropertyName("chat")] public Chat Chat { get; set; }
-        [JsonPropertyName("forward_from")] public User ForwardFrom { get; set; }
+        [JsonPropertyName("chat")] public ApiChat ApiChat { get; set; }
+        [JsonPropertyName("forward_from")] public ApiUser ForwardFrom { get; set; }
 
         [JsonPropertyName("forward_from_chat")]
-        public Chat ForwardFromChat { get; set; }
+        public ApiChat ForwardFromApiChat { get; set; }
 
         [JsonPropertyName("forward_from_message_id")]
         public int ForwardFromMessageId { get; set; }
@@ -26,9 +26,9 @@ namespace TelegramNet.Types
 
         [JsonPropertyName("forward_date")] public int ForwardDate { get; set; }
 
-        [JsonPropertyName("reply_to_message")] public Message ReplyToMessage { get; set; }
+        [JsonPropertyName("reply_to_message")] public ApiMessage ReplyToApiMessage { get; set; }
 
-        [JsonPropertyName("via_bot")] public User ViaBot { get; set; }
+        [JsonPropertyName("via_bot")] public ApiUser ViaBot { get; set; }
 
         [JsonPropertyName("edit_date")] public int EditDate { get; set; }
 
@@ -38,9 +38,9 @@ namespace TelegramNet.Types
 
         [JsonPropertyName("text")] public string Text { get; set; }
 
-        [JsonPropertyName("entities")] public MessageEntity[] Entities { get; set; }
+        [JsonPropertyName("entities")] public ApiMessageEntity[] Entities { get; set; }
 
-        [JsonPropertyName("caption_entities")] public MessageEntity[] CaptionEntities { get; set; }
+        [JsonPropertyName("caption_entities")] public ApiMessageEntity[] CaptionEntities { get; set; }
 
         [JsonPropertyName("reply_markup")] public object ReplyMarkup { get; set; }
     }

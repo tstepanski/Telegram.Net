@@ -1,9 +1,10 @@
 using System;
+using TelegramNet.Entities.Interfaces;
 using TelegramNet.ExtraTypes;
 
 namespace TelegramNet.Entities.Keyboards.Inlines
 {
-    public class InlineKeyboardButton
+    public class InlineKeyboardButton : IApiFormatable
     {
         public InlineKeyboardButton(string text,
             Uri url = null,
@@ -44,24 +45,6 @@ namespace TelegramNet.Entities.Keyboards.Inlines
 
         public Optional<bool> Pay { get; }
 
-        internal object ToApiFormat()
-        {
-            return new
-            {
-                text = Text,
-                url = Url.HasValue
-                    ? Url.Value.ToString()
-                    : string.Empty,
-                login_url = LoginUrl.HasValue
-                    ? LoginUrl.Value.ToApiFormat()
-                    : null,
-                callback_data = CallbackData.GetValueForce(),
-                switch_inline_query = SwitchInlineQuery.GetValueForce(),
-                switch_inline_query_current_chat = SwitchInlineQueryCurrentChat.GetValueForce(),
-                pay = Pay.GetValueForce()
-            };
-        }
-
         public static InlineKeyboardButton WithCallbackData(string text, string callbackData)
         {
             return new(text, callbackData: callbackData);
@@ -75,6 +58,19 @@ namespace TelegramNet.Entities.Keyboards.Inlines
         public static InlineKeyboardButton WithLoginUrl(string text, LoginUri url)
         {
             return new(text, loginUrl: url);
+        }
+
+        object IApiFormatable.GetApiFormat()
+        {
+            return new TelegramNet.Types.Inlines.ApiInlineKeyboardButton
+            {
+                Text = Text,
+                Url = Url.GetValueForce()?.ToString(),
+                CallbackData = CallbackData.GetValueForce(),
+                SwitchInlineQuery = SwitchInlineQuery.GetValueForce(),
+                SwitchInlineQueryCurrentChat = SwitchInlineQueryCurrentChat.GetValueForce(),
+                Pay = Pay.GetValueForce()
+            };
         }
     }
 }
