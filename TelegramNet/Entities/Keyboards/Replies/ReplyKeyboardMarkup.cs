@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
+using TelegramNet.Entities.Interfaces;
 
 namespace TelegramNet.Entities.Keyboards.Replies
 {
-    public class ReplyKeyboardMarkup
+    public class ReplyKeyboardMarkup : IKeyboard, IApiFormatable
     {
         public static KeyboardBuilder<KeyboardButton> Builder => new();
         public static KeyboardRowBuilder<KeyboardButton> RowBuilder => new();
@@ -44,25 +45,17 @@ namespace TelegramNet.Entities.Keyboards.Replies
 
         public bool Selective { get; }
 
-        internal Types.Replies.ReplyKeyboardMarkup GetApiFormat()
+        object IApiFormatable.GetApiFormat()
         {
-            return new()
+            return new Types.Replies.ApiReplyKeyboardMarkup()
             {
-                Keyboard = Keyboard.Select(x => x.Select(z => new Types.Replies.KeyboardButton
-                {
-                    Text = z.Text,
-                    RequestContact = z.RequestContact,
-                    RequestLocation = z.RequestLocation,
-                    RequestPoll = z.RequestPoll != null
-                        ? new Types.Replies.KeyboardButtonPollType
-                        {
-                            Type = z.RequestPoll.Type.ToString().ToLower()
-                        }
-                        : null
-                }).ToArray()).ToArray(),
-                InputFieldPlaceHolder = InputFieldPlaceholder,
-                OneTimeKeyboard = OneTimeKeyboard,
+                Keyboard = Keyboard.Select(x => x
+                        .Select(z => (z as IApiFormatable).GetApiFormat() as Types.Replies.ApiKeyboardButton)
+                        .ToArray())
+                    .ToArray(),
                 ResizeKeyboard = ResizeKeyboard,
+                OneTimeKeyboard = OneTimeKeyboard,
+                InputFieldPlaceHolder = InputFieldPlaceholder,
                 Selective = Selective
             };
         }

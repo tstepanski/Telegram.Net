@@ -10,72 +10,72 @@ using TelegramNet.Entities.Keyboards.Replies;
 using TelegramNet.ExtraTypes;
 using TelegramNet.Helpers;
 using TelegramNet.Types;
-using ReplyKeyboardMarkup = TelegramNet.Types.Replies.ReplyKeyboardMarkup;
+using TelegramNet.Types.Replies;
 
 namespace TelegramNet.Entities
 {
     public class TelegramMessage : ITelegramMessage
     {
-        internal TelegramMessage(BaseTelegramClient client, Message message)
+        internal TelegramMessage(BaseTelegramClient client, ApiMessage apiMessage)
         {
-            if (message != null)
+            if (apiMessage != null)
             {
                 #region ~Realization of entity~
 
-                Id = message.Id;
-                Author = message.Author != null
+                Id = apiMessage.Id;
+                Author = apiMessage.Author != null
                     ? new TelegramUser(client,
-                        message.Author)
+                        apiMessage.Author)
                     : default;
-                ForwardFrom = message.ForwardFrom != null
+                ForwardFrom = apiMessage.ForwardFrom != null
                     ? new TelegramUser(client,
-                        message.ForwardFrom)
+                        apiMessage.ForwardFrom)
                     : default;
-                ForwardFromChat = message.ForwardFromChat != null
+                ForwardFromChat = apiMessage.ForwardFromApiChat != null
                     ? new TelegramChat(client,
-                        message.ForwardFromChat)
+                        apiMessage.ForwardFromApiChat)
                     : default;
-                SenderChat = message.SenderChat != null
+                SenderChat = apiMessage.SenderApiChat != null
                     ? new TelegramChat(client,
-                        message.SenderChat)
+                        apiMessage.SenderApiChat)
                     : default;
                 Chat = new TelegramChat(client,
-                    message.Chat); //
-                Timestamp = message.Date != default
-                    ? UnixParser.Parse(message.Date)
+                    apiMessage.ApiChat); //
+                Timestamp = apiMessage.Date != default
+                    ? UnixParser.Parse(apiMessage.Date)
                     : default;
-                Captions = message.CaptionEntities?.Select(x => new MessageCaption(client,
+                Captions = apiMessage.CaptionEntities?.Select(x => new MessageCaption(client,
                         x,
-                        message.Text))
+                        apiMessage.Text))
                     .ToArray();
-                Text = message.Text;
-                ForwardFromMessageId = message.ForwardFromMessageId != default
-                    ? message.ForwardFromMessageId
+                Text = apiMessage.Text;
+                ForwardFromMessageId = apiMessage.ForwardFromMessageId != default
+                    ? apiMessage.ForwardFromMessageId
                     : default;
-                ForwardSignature = message.ForwardSignature;
-                ForwardSenderName = message.ForwardSenderName;
-                ForwardDate = message.ForwardDate != default
-                    ? UnixParser.Parse(message.ForwardDate)
+                ForwardSignature = apiMessage.ForwardSignature;
+                ForwardSenderName = apiMessage.ForwardSenderName;
+                ForwardDate = apiMessage.ForwardDate != default
+                    ? UnixParser.Parse(apiMessage.ForwardDate)
                     : default;
-                ReplyToMessage = message.ReplyToMessage != null
+                ReplyToMessage = apiMessage.ReplyToApiMessage != null
                     ? new TelegramMessage(client,
-                        message.ReplyToMessage)
+                        apiMessage.ReplyToApiMessage)
                     : default;
-                ViaBot = message.ViaBot != null
+                ViaBot = apiMessage.ViaBot != null
                     ? new TelegramUser(client,
-                        message.ViaBot)
+                        apiMessage.ViaBot)
                     : default;
-                EditDate = message.EditDate != default
-                    ? UnixParser.Parse(message.EditDate)
+                EditDate = apiMessage.EditDate != default
+                    ? UnixParser.Parse(apiMessage.EditDate)
                     : default;
-                MediaGroupId = message.MediaGroupId;
-                AuthorSignature = message.AuthorSignature;
-                Entities = message.Entities?.Select(x => new MessageCaption(client,
+                MediaGroupId = apiMessage.MediaGroupId;
+                AuthorSignature = apiMessage.AuthorSignature;
+                Entities = apiMessage.Entities?.Select(x => new MessageCaption(client,
                         x,
-                        message.Text))
+                        apiMessage.Text))
                     .ToArray();
 
-                var serializedButtons = message.ReplyMarkup.ToJson();
+                var serializedButtons = apiMessage.ReplyMarkup.ToJson();
 
                 try
                 {
@@ -85,12 +85,12 @@ namespace TelegramNet.Entities
                         InlineKeyboardMarkups = but.inline_keyboard.Select(x => x.Select(z =>
                                     new InlineKeyboardButton(z.Text,
                                         new Uri(z.Url),
-                                        new LoginUri(z.LoginUrl.Url == null
-                                                ? new Uri(z.LoginUrl.Url ?? string.Empty)
+                                        new LoginUri(z.ApiLoginUrl.Url == null
+                                                ? new Uri(z.ApiLoginUrl.Url ?? string.Empty)
                                                 : null,
-                                            z.LoginUrl.ForwardText,
-                                            z.LoginUrl.BotUsername,
-                                            z.LoginUrl.RequestWriteAccess)))
+                                            z.ApiLoginUrl.ForwardText,
+                                            z.ApiLoginUrl.BotUsername,
+                                            z.ApiLoginUrl.RequestWriteAccess)))
                                 .ToArray())
                             .ToArray();
                 }
@@ -101,10 +101,10 @@ namespace TelegramNet.Entities
 
                 try
                 {
-                    var but = JsonSerializer.Deserialize<ReplyKeyboardMarkup>(serializedButtons);
+                    var but = JsonSerializer.Deserialize<ApiReplyKeyboardMarkup>(serializedButtons);
 
                     if (but != null)
-                        ReplyKeyboardMarkup = new Keyboards.Replies.ReplyKeyboardMarkup(but.Keyboard.Select(x => x
+                        ReplyKeyboardMarkup = new ReplyKeyboardMarkup(but.Keyboard.Select(x => x
                                     .Select(z => new KeyboardButton(z.Text,
                                         z.RequestContact,
                                         z.RequestLocation,
@@ -117,7 +117,7 @@ namespace TelegramNet.Entities
                 {
                     // ignored
                 }
-                
+
                 #endregion
             }
             else
@@ -134,19 +134,19 @@ namespace TelegramNet.Entities
 
         public int Id { get; }
 
-        public Optional<ITelegramUser> Author { get; }
+        public Optional<TelegramUser> Author { get; }
 
-        public Optional<ITelegramChat> SenderChat { get; }
+        public Optional<TelegramChat> SenderChat { get; }
 
         public Optional<DateTime> Timestamp { get; }
 
         public Optional<string> Text { get; }
 
-        public ITelegramChat Chat { get; }
+        public TelegramChat Chat { get; }
 
-        public Optional<ITelegramUser> ForwardFrom { get; }
+        public Optional<TelegramUser> ForwardFrom { get; }
 
-        public Optional<ITelegramChat> ForwardFromChat { get; }
+        public Optional<TelegramChat> ForwardFromChat { get; }
 
         public Optional<IEnumerable<MessageCaption>> Captions { get; }
 
@@ -158,9 +158,9 @@ namespace TelegramNet.Entities
 
         public Optional<DateTime> ForwardDate { get; }
 
-        public Optional<ITelegramMessage> ReplyToMessage { get; }
+        public Optional<TelegramMessage> ReplyToMessage { get; }
 
-        public Optional<ITelegramUser> ViaBot { get; }
+        public Optional<TelegramUser> ViaBot { get; }
 
         public Optional<DateTime> EditDate { get; }
 
@@ -172,8 +172,8 @@ namespace TelegramNet.Entities
 
         public InlineKeyboardButton[][] InlineKeyboardMarkups { get; }
 
-        public TelegramNet.Entities.Keyboards.Replies.ReplyKeyboardMarkup ReplyKeyboardMarkup { get; }
-        
+        public ReplyKeyboardMarkup ReplyKeyboardMarkup { get; }
+
         public async Task<bool> DeleteAsync()
         {
             var result = await _client.RequestAsync("deleteMessage", HttpMethod.Post, new Dictionary<string, object>
@@ -187,7 +187,7 @@ namespace TelegramNet.Entities
 
         private class InlineObject
         {
-            public Types.Inlines.InlineKeyboardButton[][] inline_keyboard { get; set; }
+            public Types.Inlines.ApiInlineKeyboardButton[][] inline_keyboard { get; set; }
         }
     }
 }

@@ -1,9 +1,10 @@
 using System;
+using TelegramNet.Entities.Interfaces;
 using TelegramNet.Enums;
 
 namespace TelegramNet.Entities.Keyboards.Replies
 {
-    public class KeyboardButtonPollType
+    public class KeyboardButtonPollType : IApiFormatable
     {
         public KeyboardButtonPollType(PollType poll)
         {
@@ -19,7 +20,15 @@ namespace TelegramNet.Entities.Keyboards.Replies
                 _ => throw new ArgumentOutOfRangeException(nameof(expression), expression, null)
             };
         }
-        
+
         public PollType Type { get; }
+
+        object IApiFormatable.GetApiFormat()
+        {
+            return new Types.Replies.ApiKeyboardButtonPollType()
+            {
+                Type = Type.ToString().ToLower()
+            };
+        }
     }
 }

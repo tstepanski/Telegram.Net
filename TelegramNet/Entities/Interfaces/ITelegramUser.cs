@@ -1,5 +1,5 @@
+using System;
 using System.Threading.Tasks;
-using TelegramNet.Entities.Keyboards;
 using TelegramNet.Entities.Keyboards.Inlines;
 using TelegramNet.Entities.Keyboards.Replies;
 using TelegramNet.Enums;
@@ -21,9 +21,14 @@ namespace TelegramNet.Entities.Interfaces
 
         public UserMention Mention { get; }
 
+        [Obsolete]
         public Task<TelegramClientMessage> SendMessageAsync(string text,
             ParseMode mode = ParseMode.MarkdownV2,
             InlineKeyboardMarkup inlineMarkup = null,
             ReplyKeyboardMarkup replyMarkup = null);
+
+        public Task<TelegramClientMessage> SendMessageAsync(string text,
+            ParseMode mode = ParseMode.MarkdownV2,
+            IKeyboard keyboard = null);
     }
 }

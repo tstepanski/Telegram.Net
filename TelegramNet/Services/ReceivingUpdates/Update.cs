@@ -7,13 +7,13 @@ namespace TelegramNet.Services.ReceivingUpdates
     {
         [JsonPropertyName("update_id")] public int UpdateId { get; set; }
 
-        [JsonPropertyName("message")] public Message Message { get; set; }
+        [JsonPropertyName("message")] public ApiMessage ApiMessage { get; set; }
 
-        [JsonPropertyName("edited_message")] public Message EditedMessage { get; set; }
+        [JsonPropertyName("edited_message")] public ApiMessage EditedApiMessage { get; set; }
 
-        [JsonPropertyName("channel_post")] public Message ChannelPost { get; set; }
+        [JsonPropertyName("channel_post")] public ApiMessage ChannelPost { get; set; }
 
         [JsonPropertyName("edited_channel_post")]
-        public Message EditedChannelPost { get; set; }
+        public ApiMessage EditedChannelPost { get; set; }
     }
 }

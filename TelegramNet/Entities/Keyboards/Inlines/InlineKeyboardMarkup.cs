@@ -1,11 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using TelegramNet.ExtraTypes;
+using TelegramNet.Entities.Interfaces;
 
 namespace TelegramNet.Entities.Keyboards.Inlines
 {
-    public class InlineKeyboardMarkup
+    public class InlineKeyboardMarkup : IKeyboard, IApiFormatable
     {
         public static KeyboardBuilder<InlineKeyboardButton> Builder => new();
         public static KeyboardRowBuilder<InlineKeyboardButton> RowBuilder => new();
@@ -32,9 +31,15 @@ namespace TelegramNet.Entities.Keyboards.Inlines
 
         public IEnumerable<InlineKeyboardButton[]> Buttons { get; }
 
-        internal object ToApiFormat()
+        object IApiFormatable.GetApiFormat()
         {
-            return new {inline_keyboard = Buttons.Select(x => x.Select(z => z.ToApiFormat()).ToArray()).ToArray()};
+            return new TelegramNet.Types.Inlines.ApiInlineKeyboardMarkup()
+            {
+                InlineKeyboard = Buttons.Select(x => x
+                        .Select(z => (z as IApiFormatable).GetApiFormat() as Types.Inlines.ApiInlineKeyboardButton)
+                        .ToArray())
+                    .ToArray()
+            };
         }
     }
 }

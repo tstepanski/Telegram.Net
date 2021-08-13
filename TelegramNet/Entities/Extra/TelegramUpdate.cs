@@ -31,8 +31,8 @@ namespace TelegramNet.Entities.Extra
         {
             return new(
                 update.UpdateId,
-                update.Message != null ? new TelegramMessage(client, update.Message) : null,
-                update.EditedMessage != null ? new TelegramMessage(client, update.EditedMessage) : null,
+                update.ApiMessage != null ? new TelegramMessage(client, update.ApiMessage) : null,
+                update.EditedApiMessage != null ? new TelegramMessage(client, update.EditedApiMessage) : null,
                 update.ChannelPost != null ? new TelegramMessage(client, update.ChannelPost) : null,
                 update.EditedChannelPost != null ? new TelegramMessage(client, update.EditedChannelPost) : null);
         }

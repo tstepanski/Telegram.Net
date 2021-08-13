@@ -11,18 +11,18 @@ namespace TelegramNet.Entities
 {
     public class TelegramChat : ITelegramChat
     {
-        internal TelegramChat(BaseTelegramClient client, Chat chat)
+        internal TelegramChat(BaseTelegramClient client, ApiChat apiChat)
         {
-            if (chat != null)
+            if (apiChat != null)
             {
                 #region ~Realization of entity
 
-                Id = chat.Id;
-                Type = chat.Type ?? string.Empty;
-                Title = chat.Title ?? string.Empty;
-                Username = chat.Username ?? string.Empty;
-                FirstName = chat.FirstName ?? string.Empty;
-                LastName = chat.LastName ?? string.Empty;
+                Id = apiChat.Id;
+                Type = apiChat.Type ?? string.Empty;
+                Title = apiChat.Title ?? string.Empty;
+                Username = apiChat.Username ?? string.Empty;
+                FirstName = apiChat.FirstName ?? string.Empty;
+                LastName = apiChat.LastName ?? string.Empty;
 
                 #endregion
             }
@@ -45,15 +45,30 @@ namespace TelegramNet.Entities
         public Optional<string> FirstName { get; }
         public Optional<string> LastName { get; }
 
-        public async Task<TelegramClientMessage> SendMessageAsync(string text, ParseMode mode = ParseMode.MarkdownV2,
+        [Obsolete]
+        public async Task<TelegramClientMessage> SendMessageAsync(string textO, ParseMode mode = ParseMode.MarkdownV2,
             InlineKeyboardMarkup inlineMarkup = null,
             Keyboards.Replies.ReplyKeyboardMarkup replyMarkup = null)
         {
             return await _tgClient.SendMessageAsync(Id,
-                text,
+                textO,
                 mode,
                 inlineMarkup,
                 replyMarkup);
+        }
+
+        public async Task<TelegramClientMessage> SendMessageAsync(string text, ParseMode mode = ParseMode.MarkdownV2,
+            IKeyboard keyboard = null)
+        {
+            return await _tgClient.SendMessageAsync(Id,
+                text,
+                mode,
+                keyboard);
+        }
+
+        public static implicit operator ChatId(TelegramChat chat)
+        {
+            return chat.Id;
         }
     }
 }

@@ -13,7 +13,7 @@ namespace TelegramNet.Entities
 {
     public class TelegramUser : ITelegramUser
     {
-        internal TelegramUser(BaseTelegramClient client, User user)
+        internal TelegramUser(BaseTelegramClient client, ApiUser user)
         {
             if (user != null)
             {
@@ -55,16 +55,27 @@ namespace TelegramNet.Entities
         public Optional<bool> SupportsInlineQueries { get; }
         public UserMention Mention { get; }
 
-        public async Task<TelegramClientMessage> SendMessageAsync(string text,
+        [Obsolete]
+        public async Task<TelegramClientMessage> SendMessageAsync(string textO,
             ParseMode parseMode = ParseMode.MarkdownV2,
             InlineKeyboardMarkup inlineMarkup = null,
             ReplyKeyboardMarkup replyMarkup = null)
         {
             return await _tgClient.SendMessageAsync(Id,
-                text,
+                textO,
                 parseMode,
                 inlineMarkup,
                 replyMarkup);
+        }
+
+        public async Task<TelegramClientMessage> SendMessageAsync(string text,
+            ParseMode parseMode = ParseMode.MarkdownV2,
+            IKeyboard keyboard = null)
+        {
+            return await _tgClient.SendMessageAsync(Id,
+                text,
+                parseMode,
+                keyboard);
         }
 
         public override string ToString()

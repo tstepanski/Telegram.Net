@@ -8,8 +8,8 @@ namespace TelegramNet.Entities
 {
     public class TelegramClientMessage : TelegramMessage
     {
-        internal TelegramClientMessage(BaseTelegramClient client, Message message, ParseMode mode) : base(client,
-            message)
+        internal TelegramClientMessage(BaseTelegramClient client, ApiMessage apiMessage, ParseMode mode) : base(client,
+            apiMessage)
         {
             _client = client.TelegramApi;
             _mode = mode;
