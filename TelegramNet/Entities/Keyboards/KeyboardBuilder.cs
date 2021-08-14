@@ -5,11 +5,7 @@ namespace TelegramNet.Entities.Keyboards
 {
     public class KeyboardBuilder<T>
     {
-        public KeyboardBuilder()
-        {
-        }
-
-        internal List<T[]> Buttons { get; init; } = new();
+	    internal List<T[]> Buttons { get; init; } = new();
 
         public KeyboardBuilder<T> AddRows(IEnumerable<T[]> buttons)
         {
