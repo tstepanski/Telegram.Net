@@ -6,16 +6,16 @@ namespace TelegramNet.ExtraTypes
     {
         public override int GetHashCode()
         {
-            return HashCode.Combine(value, HasValue);
+            return HashCode.Combine(_value, HasValue);
         }
 
         public override string ToString()
         {
-            return $"{(HasValue ? value.ToString() : "NoVal")}";
+            return $"{(HasValue ? _value.ToString() : "NoVal")}";
         }
 
         public bool HasValue { get; }
-        private T value;
+        private T _value;
 
         public T Value
         {
@@ -23,7 +23,7 @@ namespace TelegramNet.ExtraTypes
             {
                 if (HasValue)
                 {
-	                return value;
+	                return _value;
                 }
                 else
                 {
@@ -36,19 +36,19 @@ namespace TelegramNet.ExtraTypes
         {
             if (value != null)
             {
-                this.value = value;
+                this._value = value;
                 HasValue = true;
             }
             else
             {
-                this.value = value;
+                this._value = value;
                 HasValue = false;
             }
         }
 
         public T GetValueForce()
         {
-            return !HasValue ? default : value;
+            return !HasValue ? default : _value;
         }
 
         public static explicit operator T(Optional<T> optional)
@@ -80,7 +80,7 @@ namespace TelegramNet.ExtraTypes
         {
             if (HasValue && other.HasValue)
             {
-	            return Equals(value, other.value);
+	            return Equals(_value, other._value);
             }
 
             return HasValue == other.HasValue;

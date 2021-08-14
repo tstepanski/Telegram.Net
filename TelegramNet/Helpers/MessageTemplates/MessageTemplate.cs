@@ -11,10 +11,10 @@ namespace TelegramNet.Helpers.MessageTemplates
     {
         public MessageTemplate(BaseTelegramClient client)
         {
-            this.client = client;
+            this._client = client;
         }
 
-        private readonly BaseTelegramClient client;
+        private readonly BaseTelegramClient _client;
 
         public string Text { get; private set; }
         public IKeyboard Keyboard { get; private set; }
@@ -27,7 +27,7 @@ namespace TelegramNet.Helpers.MessageTemplates
             var msgs = new List<TelegramClientMessage>();
             if (Text != null)
             {
-                var msg = await client.SendMessageAsync(id, Text, ParseMode, Keyboard);
+                var msg = await _client.SendMessageAsync(id, Text, ParseMode, Keyboard);
                 if (msg != null)
                 {
 	                msgs.Add(msg);
@@ -36,7 +36,7 @@ namespace TelegramNet.Helpers.MessageTemplates
 
             if (DocumentUri != null)
             {
-                var msg = await client.SendDocumentAsync(id: id, DocumentUri);
+                var msg = await _client.SendDocumentAsync(id: id, DocumentUri);
                 if (msg != null)
                 {
 	                msgs.Add(msg);
@@ -45,7 +45,7 @@ namespace TelegramNet.Helpers.MessageTemplates
 
             if (ImageUri != null)
             {
-                var msg = await client.SendPhotoAsync(id: id, ImageUri);
+                var msg = await _client.SendPhotoAsync(id: id, ImageUri);
                 if (msg != null)
                 {
 	                msgs.Add(msg);
@@ -87,7 +87,7 @@ namespace TelegramNet.Helpers.MessageTemplates
 
         public async Task<TelegramClientMessage[]> SendAsync(ChatId id)
         {
-            var chat = await client.GetChatAsync(id);
+            var chat = await _client.GetChatAsync(id);
 
             if (chat == null)
             {

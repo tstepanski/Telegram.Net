@@ -83,7 +83,7 @@ namespace TelegramNet.Entities
 
                     if (but != null)
                     {
-	                    InlineKeyboardMarkups = but.inline_keyboard.Select(x => x.Select(z =>
+	                    InlineKeyboardMarkups = but.InlineKeyboard.Select(x => x.Select(z =>
 				                    new InlineKeyboardButton(z.Text,
 					                    new Uri(z.Url),
 					                    new LoginUri(z.ApiLoginUrl.Url == null
@@ -191,7 +191,7 @@ namespace TelegramNet.Entities
 
         private class InlineObject
         {
-            public Types.Inlines.ApiInlineKeyboardButton[][] inline_keyboard { get; set; }
+            public Types.Inlines.ApiInlineKeyboardButton[][] InlineKeyboard { get; set; }
         }
     }
 }

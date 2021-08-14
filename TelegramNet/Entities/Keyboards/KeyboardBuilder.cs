@@ -16,9 +16,9 @@ namespace TelegramNet.Entities.Keyboards
             };
         }
 
-        public KeyboardBuilder<T> AddRows(IEnumerable<KeyboardRowBuilder<T>> RowBuilders)
+        public KeyboardBuilder<T> AddRows(IEnumerable<KeyboardRowBuilder<T>> rowBuilders)
         {
-            return AddRows(RowBuilders.Select(x => x.Build()));
+            return AddRows(rowBuilders.Select(x => x.Build()));
         }
 
         public KeyboardBuilder<T> AddRow(T[] buttons)
@@ -30,9 +30,9 @@ namespace TelegramNet.Entities.Keyboards
             };
         }
 
-        public KeyboardBuilder<T> AddRow(KeyboardRowBuilder<T> RowBuilder)
+        public KeyboardBuilder<T> AddRow(KeyboardRowBuilder<T> rowBuilder)
         {
-            return AddRow(RowBuilder.Build());
+            return AddRow(rowBuilder.Build());
         }
 
         public static KeyboardBuilder<T> CreateWithRow(T[] buttons)
@@ -41,22 +41,22 @@ namespace TelegramNet.Entities.Keyboards
                 .AddRow(buttons);
         }
 
-        public static KeyboardBuilder<T> CreateWithRow(KeyboardRowBuilder<T> RowBuilder)
+        public static KeyboardBuilder<T> CreateWithRow(KeyboardRowBuilder<T> rowBuilder)
         {
             return new KeyboardBuilder<T>()
-                .AddRow(RowBuilder);
+                .AddRow(rowBuilder);
         }
 
-        public static KeyboardBuilder<T> CreateWithRows(IEnumerable<T[]> Rows)
+        public static KeyboardBuilder<T> CreateWithRows(IEnumerable<T[]> rows)
         {
             return new KeyboardBuilder<T>()
-                .AddRows(Rows);
+                .AddRows(rows);
         }
 
-        public static KeyboardBuilder<T> CreateWithRows(IEnumerable<KeyboardRowBuilder<T>> RowBuilders)
+        public static KeyboardBuilder<T> CreateWithRows(IEnumerable<KeyboardRowBuilder<T>> rowBuilders)
         {
             return new KeyboardBuilder<T>()
-                .AddRows(RowBuilders);
+                .AddRows(rowBuilders);
         }
     }
 }

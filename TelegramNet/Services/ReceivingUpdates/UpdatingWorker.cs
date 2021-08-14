@@ -9,7 +9,7 @@ namespace TelegramNet.Services.ReceivingUpdates
 {
     internal class UpdatingWorker
     {
-        private int lastId = 0;
+        private int _lastId = 0;
 
         public UpdatingWorker(BaseTelegramClient client)
         {
@@ -28,7 +28,7 @@ namespace TelegramNet.Services.ReceivingUpdates
             {
                 while (!_stop)
                 {
-                    config.Offset = lastId + 1;
+                    config.Offset = _lastId + 1;
                     var response =
                         await _api.RequestAsync<Update[]>("getUpdates", HttpMethod.Get, config.ToJson());
 
@@ -43,7 +43,7 @@ namespace TelegramNet.Services.ReceivingUpdates
 
                         if (response.Length > 0)
                         {
-	                        lastId = response.Select(x => x.UpdateId).OrderByDescending(x => x).First();
+	                        _lastId = response.Select(x => x.UpdateId).OrderByDescending(x => x).First();
                         }
 
                         onUpdate?.Invoke(response);
