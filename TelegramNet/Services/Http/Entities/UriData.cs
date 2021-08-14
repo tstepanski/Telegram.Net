@@ -22,7 +22,10 @@ namespace TelegramNet.Services.Http.Entities
 
             sb.Append("?");
 
-            foreach (var parameter in _parameters) sb.Append($"{parameter.Key}={parameter.Value}&");
+            foreach (var parameter in _parameters)
+            {
+	            sb.Append($"{parameter.Key}={parameter.Value}&");
+            }
 
             return new Uri(url + (_parameters.Count > 0 ? sb.ToString() : string.Empty));
         }

@@ -19,8 +19,10 @@ namespace TelegramNet.Entities.Keyboards.Inlines
             var callbackDataIsNull = callbackData == null;
 
             if (urlIsNull && loginUrlIsNull && callbackDataIsNull)
-                throw new InvalidOperationException(
-                    $"{nameof(InlineKeyboardButton)} must have url or loginUrl or callbackData.");
+            {
+	            throw new InvalidOperationException(
+		            $"{nameof(InlineKeyboardButton)} must have url or loginUrl or callbackData.");
+            }
 
             Text = text;
             Url = url;

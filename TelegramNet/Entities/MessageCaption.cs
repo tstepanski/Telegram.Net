@@ -35,13 +35,19 @@ namespace TelegramNet.Entities
             };
 
             if (entity.User != null)
-                User = new TelegramUser(client, entity.User);
+            {
+	            User = new TelegramUser(client, entity.User);
+            }
 
             if (entity.Url != null)
-                Url = new Uri(entity.Url);
+            {
+	            Url = new Uri(entity.Url);
+            }
 
             if (entity.Language != null)
-                Language = entity.Language;
+            {
+	            Language = entity.Language;
+            }
         }
 
         public MessageCaptionType Type { get; }

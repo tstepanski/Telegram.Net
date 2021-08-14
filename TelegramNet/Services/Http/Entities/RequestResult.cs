@@ -11,7 +11,10 @@ namespace TelegramNet.Services.Http.Entities
 
             Description = new Optional<string>(result.Description);
             ErrorCode = new Optional<int>(result.ErrorCode);
-            if (Ok) Result = new Optional<T>(JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(result.Result)));
+            if (Ok)
+            {
+	            Result = new Optional<T>(JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(result.Result)));
+            }
         }
 
         public bool Ok { get; internal init; }
@@ -29,7 +32,10 @@ namespace TelegramNet.Services.Http.Entities
 
         public T EnsureSuccess()
         {
-            if (IsSuccess()) return Result.Value;
+            if (IsSuccess())
+            {
+	            return Result.Value;
+            }
 
             throw new EnsureFailedException<T>(Description.Value ?? string.Empty);
         }

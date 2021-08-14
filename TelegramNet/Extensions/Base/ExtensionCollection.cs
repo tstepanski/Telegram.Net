@@ -28,7 +28,10 @@ namespace TelegramNet.Extensions.Base
 
         internal async Task RunAllExtensionsAsync()
         {
-            foreach (var extension in _extensions) await extension.SetupAsync(_bClient, _client, _services);
+            foreach (var extension in _extensions)
+            {
+	            await extension.SetupAsync(_bClient, _client, _services);
+            }
         }
 
         public IEnumerator<Extension> GetEnumerator()

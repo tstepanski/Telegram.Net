@@ -65,13 +65,25 @@ namespace TelegramNet
         {
             foreach (var update in updates)
             {
-                if (update.Message != null) OnMessageReceived?.Invoke(update.Message);
+                if (update.Message != null)
+                {
+	                OnMessageReceived?.Invoke(update.Message);
+                }
 
-                if (update.EditedMessage != null) OnMessageEdited?.Invoke(update.EditedMessage);
+                if (update.EditedMessage != null)
+                {
+	                OnMessageEdited?.Invoke(update.EditedMessage);
+                }
 
-                if (update.ChannelPost != null) OnChannelPost?.Invoke(update.ChannelPost);
+                if (update.ChannelPost != null)
+                {
+	                OnChannelPost?.Invoke(update.ChannelPost);
+                }
 
-                if (update.EditedChannelPost != null) OnChannelPostEdited?.Invoke(update.EditedChannelPost);
+                if (update.EditedChannelPost != null)
+                {
+	                OnChannelPostEdited?.Invoke(update.EditedChannelPost);
+                }
             }
 
             return Task.CompletedTask;

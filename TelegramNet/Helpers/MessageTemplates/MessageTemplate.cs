@@ -29,21 +29,27 @@ namespace TelegramNet.Helpers.MessageTemplates
             {
                 var msg = await client.SendMessageAsync(id, Text, ParseMode, Keyboard);
                 if (msg != null)
-                    msgs.Add(msg);
+                {
+	                msgs.Add(msg);
+                }
             }
 
             if (DocumentUri != null)
             {
                 var msg = await client.SendDocumentAsync(id: id, DocumentUri);
                 if (msg != null)
-                    msgs.Add(msg);
+                {
+	                msgs.Add(msg);
+                }
             }
 
             if (ImageUri != null)
             {
                 var msg = await client.SendPhotoAsync(id: id, ImageUri);
                 if (msg != null)
-                    msgs.Add(msg);
+                {
+	                msgs.Add(msg);
+                }
             }
 
             return msgs.ToArray();
@@ -83,7 +89,10 @@ namespace TelegramNet.Helpers.MessageTemplates
         {
             var chat = await client.GetChatAsync(id);
 
-            if (chat == null) throw new InvalidOperationException($"Can't find the apiChat associated with {id}");
+            if (chat == null)
+            {
+	            throw new InvalidOperationException($"Can't find the apiChat associated with {id}");
+            }
 
             var mess = await ExecuteTemplateAsync(chat);
             return mess;

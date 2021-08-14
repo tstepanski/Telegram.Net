@@ -24,7 +24,10 @@ namespace TelegramNet.Logging
                 CustomSource = customSource
             });
 
-            if (!_useConsole) return;
+            if (!_useConsole)
+            {
+	            return;
+            }
 
             switch (source)
             {

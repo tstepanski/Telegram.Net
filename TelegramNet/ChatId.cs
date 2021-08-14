@@ -26,7 +26,10 @@ namespace TelegramNet
             var isInteger = TryFetchInteger(out var id);
 
             if (isInteger)
-                return id;
+            {
+	            return id;
+            }
+
             return Id;
         }
 

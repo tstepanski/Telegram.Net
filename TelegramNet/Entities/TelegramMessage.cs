@@ -82,17 +82,19 @@ namespace TelegramNet.Entities
                     var but = JsonSerializer.Deserialize<InlineObject>(serializedButtons);
 
                     if (but != null)
-                        InlineKeyboardMarkups = but.inline_keyboard.Select(x => x.Select(z =>
-                                    new InlineKeyboardButton(z.Text,
-                                        new Uri(z.Url),
-                                        new LoginUri(z.ApiLoginUrl.Url == null
-                                                ? new Uri(z.ApiLoginUrl.Url ?? string.Empty)
-                                                : null,
-                                            z.ApiLoginUrl.ForwardText,
-                                            z.ApiLoginUrl.BotUsername,
-                                            z.ApiLoginUrl.RequestWriteAccess)))
-                                .ToArray())
-                            .ToArray();
+                    {
+	                    InlineKeyboardMarkups = but.inline_keyboard.Select(x => x.Select(z =>
+				                    new InlineKeyboardButton(z.Text,
+					                    new Uri(z.Url),
+					                    new LoginUri(z.ApiLoginUrl.Url == null
+							                    ? new Uri(z.ApiLoginUrl.Url ?? string.Empty)
+							                    : null,
+						                    z.ApiLoginUrl.ForwardText,
+						                    z.ApiLoginUrl.BotUsername,
+						                    z.ApiLoginUrl.RequestWriteAccess)))
+			                    .ToArray())
+		                    .ToArray();
+                    }
                 }
                 catch (Exception)
                 {
@@ -104,14 +106,16 @@ namespace TelegramNet.Entities
                     var but = JsonSerializer.Deserialize<ApiReplyKeyboardMarkup>(serializedButtons);
 
                     if (but != null)
-                        ReplyKeyboardMarkup = new ReplyKeyboardMarkup(but.Keyboard.Select(x => x
-                                    .Select(z => new KeyboardButton(z.Text,
-                                        z.RequestContact,
-                                        z.RequestLocation,
-                                        new KeyboardButtonPollType(z.RequestPoll.Type)))
-                                    .ToArray())
-                                .ToArray(), but.ResizeKeyboard, but.OneTimeKeyboard, but.InputFieldPlaceHolder,
-                            but.Selective);
+                    {
+	                    ReplyKeyboardMarkup = new ReplyKeyboardMarkup(but.Keyboard.Select(x => x
+				                    .Select(z => new KeyboardButton(z.Text,
+					                    z.RequestContact,
+					                    z.RequestLocation,
+					                    new KeyboardButtonPollType(z.RequestPoll.Type)))
+				                    .ToArray())
+			                    .ToArray(), but.ResizeKeyboard, but.OneTimeKeyboard, but.InputFieldPlaceHolder,
+		                    but.Selective);
+                    }
                 }
                 catch (Exception)
                 {

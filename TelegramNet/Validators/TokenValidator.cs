@@ -7,12 +7,16 @@ namespace TelegramNet.Validators
             var parts = token.Split(':');
 
             if (parts.Length != 2)
-                return false;
+            {
+	            return false;
+            }
 
             var isInteger = int.TryParse(parts[0], out var _);
 
             if (!isInteger)
-                return false;
+            {
+	            return false;
+            }
 
             return parts[1].Length != 0;
         }

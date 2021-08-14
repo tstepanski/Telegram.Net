@@ -22,9 +22,13 @@ namespace TelegramNet.ExtraTypes
             get
             {
                 if (HasValue)
-                    return value;
+                {
+	                return value;
+                }
                 else
-                    throw new InvalidOperationException();
+                {
+	                throw new InvalidOperationException();
+                }
             }
         }
 
@@ -55,7 +59,9 @@ namespace TelegramNet.ExtraTypes
         public static implicit operator Optional<T>(T value)
         {
             if (value != null)
-                return new Optional<T>(value);
+            {
+	            return new Optional<T>(value);
+            }
 
             return new Optional<T>(default);
         }
@@ -63,7 +69,9 @@ namespace TelegramNet.ExtraTypes
         public override bool Equals(object obj)
         {
             if (obj is Optional<T>)
-                return Equals((Optional<T>) obj);
+            {
+	            return Equals((Optional<T>) obj);
+            }
 
             return false;
         }
@@ -71,7 +79,9 @@ namespace TelegramNet.ExtraTypes
         public bool Equals(Optional<T> other)
         {
             if (HasValue && other.HasValue)
-                return Equals(value, other.value);
+            {
+	            return Equals(value, other.value);
+            }
 
             return HasValue == other.HasValue;
         }

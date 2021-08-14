@@ -13,7 +13,10 @@ namespace Test
 
             Assert.IsTrue(TokenValidator.Validate(validToken));
 
-            foreach (var token in invalidTokens) Assert.IsFalse(TokenValidator.Validate(token));
+            foreach (var token in invalidTokens)
+            {
+	            Assert.IsFalse(TokenValidator.Validate(token));
+            }
         }
     }
 }

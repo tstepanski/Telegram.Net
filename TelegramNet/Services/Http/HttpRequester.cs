@@ -22,8 +22,15 @@ namespace TelegramNet.Services.Http
 
         internal async Task<HttpResult> ExecuteMethodAsync(string methodName, HttpMethod method, string json = null)
         {
-            if (methodName == null) throw new ArgumentNullException(nameof(methodName));
-            if (method == null) throw new ArgumentNullException(nameof(method));
+            if (methodName == null)
+            {
+	            throw new ArgumentNullException(nameof(methodName));
+            }
+
+            if (method == null)
+            {
+	            throw new ArgumentNullException(nameof(method));
+            }
 
             try
             {
@@ -54,8 +61,15 @@ namespace TelegramNet.Services.Http
 
         internal async Task<HttpResult> ExecuteMethodAsync(UriData data, HttpMethod method)
         {
-            if (data == null) throw new ArgumentNullException(nameof(data));
-            if (method == null) throw new ArgumentNullException(nameof(method));
+            if (data == null)
+            {
+	            throw new ArgumentNullException(nameof(data));
+            }
+
+            if (method == null)
+            {
+	            throw new ArgumentNullException(nameof(method));
+            }
 
             try
             {
@@ -77,8 +91,15 @@ namespace TelegramNet.Services.Http
 
         internal HttpResult ExecuteMethod(string methodName, HttpMethod method, string json = null)
         {
-            if (method == null) throw new ArgumentNullException(nameof(method));
-            if (methodName == null) throw new ArgumentNullException(nameof(methodName));
+            if (method == null)
+            {
+	            throw new ArgumentNullException(nameof(method));
+            }
+
+            if (methodName == null)
+            {
+	            throw new ArgumentNullException(nameof(methodName));
+            }
 
             try
             {
@@ -114,8 +135,15 @@ namespace TelegramNet.Services.Http
 
         internal HttpResult ExecuteMethod(UriData data, HttpMethod method)
         {
-            if (method == null) throw new ArgumentNullException(nameof(method));
-            if (data == null) throw new ArgumentNullException(nameof(data));
+            if (method == null)
+            {
+	            throw new ArgumentNullException(nameof(method));
+            }
+
+            if (data == null)
+            {
+	            throw new ArgumentNullException(nameof(data));
+            }
 
             try
             {

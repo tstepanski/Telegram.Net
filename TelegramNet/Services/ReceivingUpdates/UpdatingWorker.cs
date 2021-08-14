@@ -42,7 +42,9 @@ namespace TelegramNet.Services.ReceivingUpdates
                         }
 
                         if (response.Length > 0)
-                            lastId = response.Select(x => x.UpdateId).OrderByDescending(x => x).First();
+                        {
+	                        lastId = response.Select(x => x.UpdateId).OrderByDescending(x => x).First();
+                        }
 
                         onUpdate?.Invoke(response);
                     }

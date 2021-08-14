@@ -13,7 +13,10 @@ namespace TelegramNet.Helpers
 
             var vals = new Dictionary<string, object>();
 
-            foreach (var t in props) vals.Add(t.Name, t.GetValue(entity));
+            foreach (var t in props)
+            {
+	            vals.Add(t.Name, t.GetValue(entity));
+            }
 
             return vals;
         }
