@@ -17,7 +17,7 @@ namespace TelegramNet.Logging
 
         public static void Log(string message, LogSource source, string customSource = null)
         {
-            OnMessage?.Invoke(new LogMessage()
+            OnMessage?.Invoke(new LogMessage
             {
                 Message = message,
                 Source = source,

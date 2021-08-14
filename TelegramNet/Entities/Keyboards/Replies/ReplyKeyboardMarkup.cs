@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using TelegramNet.Entities.Interfaces;
+using TelegramNet.Types.Replies;
 
 namespace TelegramNet.Entities.Keyboards.Replies
 {
@@ -47,10 +48,10 @@ namespace TelegramNet.Entities.Keyboards.Replies
 
         object IApiFormatable.GetApiFormat()
         {
-            return new Types.Replies.ApiReplyKeyboardMarkup()
+            return new ApiReplyKeyboardMarkup
             {
                 Keyboard = Keyboard.Select(x => x
-                        .Select(z => (z as IApiFormatable).GetApiFormat() as Types.Replies.ApiKeyboardButton)
+                        .Select(z => (z as IApiFormatable).GetApiFormat() as ApiKeyboardButton)
                         .ToArray())
                     .ToArray(),
                 ResizeKeyboard = ResizeKeyboard,

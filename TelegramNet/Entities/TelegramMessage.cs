@@ -10,6 +10,7 @@ using TelegramNet.Entities.Keyboards.Replies;
 using TelegramNet.ExtraTypes;
 using TelegramNet.Helpers;
 using TelegramNet.Types;
+using TelegramNet.Types.Inlines;
 using TelegramNet.Types.Replies;
 
 namespace TelegramNet.Entities
@@ -191,7 +192,7 @@ namespace TelegramNet.Entities
 
         private class InlineObject
         {
-            public Types.Inlines.ApiInlineKeyboardButton[][] InlineKeyboard { get; set; }
+            public ApiInlineKeyboardButton[][] InlineKeyboard { get; set; }
         }
     }
 }

@@ -1,4 +1,5 @@
 using TelegramNet.Entities.Interfaces;
+using TelegramNet.Types.Replies;
 
 namespace TelegramNet.Entities.Keyboards.Replies
 {
@@ -30,12 +31,12 @@ namespace TelegramNet.Entities.Keyboards.Replies
 
         object IApiFormatable.GetApiFormat()
         {
-            return new Types.Replies.ApiKeyboardButton()
+            return new ApiKeyboardButton
             {
                 Text = Text,
                 RequestContact = RequestContact,
                 RequestLocation = RequestLocation,
-                RequestPoll = (RequestPoll as IApiFormatable)?.GetApiFormat() as Types.Replies.ApiKeyboardButtonPollType
+                RequestPoll = (RequestPoll as IApiFormatable)?.GetApiFormat() as ApiKeyboardButtonPollType
             };
         }
     }

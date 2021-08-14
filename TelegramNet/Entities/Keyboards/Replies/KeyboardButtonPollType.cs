@@ -1,6 +1,7 @@
 using System;
 using TelegramNet.Entities.Interfaces;
 using TelegramNet.Enums;
+using TelegramNet.Types.Replies;
 
 namespace TelegramNet.Entities.Keyboards.Replies
 {
@@ -25,7 +26,7 @@ namespace TelegramNet.Entities.Keyboards.Replies
 
         object IApiFormatable.GetApiFormat()
         {
-            return new Types.Replies.ApiKeyboardButtonPollType()
+            return new ApiKeyboardButtonPollType
             {
                 Type = Type.ToString().ToLower()
             };

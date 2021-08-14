@@ -9,7 +9,7 @@ namespace TelegramNet.Services.ReceivingUpdates
 {
     internal class UpdatingWorker
     {
-        private int _lastId = 0;
+        private int _lastId;
 
         public UpdatingWorker(BaseTelegramClient client)
         {

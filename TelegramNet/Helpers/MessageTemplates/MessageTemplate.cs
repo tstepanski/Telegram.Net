@@ -11,7 +11,7 @@ namespace TelegramNet.Helpers.MessageTemplates
     {
         public MessageTemplate(BaseTelegramClient client)
         {
-            this._client = client;
+            _client = client;
         }
 
         private readonly BaseTelegramClient _client;

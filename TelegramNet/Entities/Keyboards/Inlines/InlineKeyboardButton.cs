@@ -1,6 +1,7 @@
 using System;
 using TelegramNet.Entities.Interfaces;
 using TelegramNet.ExtraTypes;
+using TelegramNet.Types.Inlines;
 
 namespace TelegramNet.Entities.Keyboards.Inlines
 {
@@ -64,7 +65,7 @@ namespace TelegramNet.Entities.Keyboards.Inlines
 
         object IApiFormatable.GetApiFormat()
         {
-            return new TelegramNet.Types.Inlines.ApiInlineKeyboardButton
+            return new ApiInlineKeyboardButton
             {
                 Text = Text,
                 Url = Url.GetValueForce()?.ToString(),

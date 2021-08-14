@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using TelegramNet.Entities.Interfaces;
+using TelegramNet.Types.Inlines;
 
 namespace TelegramNet.Entities.Keyboards.Inlines
 {
@@ -33,10 +34,10 @@ namespace TelegramNet.Entities.Keyboards.Inlines
 
         object IApiFormatable.GetApiFormat()
         {
-            return new TelegramNet.Types.Inlines.ApiInlineKeyboardMarkup()
+            return new ApiInlineKeyboardMarkup
             {
                 InlineKeyboard = Buttons.Select(x => x
-                        .Select(z => (z as IApiFormatable).GetApiFormat() as Types.Inlines.ApiInlineKeyboardButton)
+                        .Select(z => (z as IApiFormatable).GetApiFormat() as ApiInlineKeyboardButton)
                         .ToArray())
                     .ToArray()
             };

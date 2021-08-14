@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using TelegramNet.Entities.Interfaces;
 using TelegramNet.Entities.Keyboards.Inlines;
+using TelegramNet.Entities.Keyboards.Replies;
 using TelegramNet.Enums;
 using TelegramNet.ExtraTypes;
 using TelegramNet.Helpers;
@@ -48,7 +49,7 @@ namespace TelegramNet.Entities
         [Obsolete]
         public async Task<TelegramClientMessage> SendMessageAsync(string textO, ParseMode mode = ParseMode.MarkdownV2,
             InlineKeyboardMarkup inlineMarkup = null,
-            Keyboards.Replies.ReplyKeyboardMarkup replyMarkup = null)
+            ReplyKeyboardMarkup replyMarkup = null)
         {
             return await _tgClient.SendMessageAsync(Id,
                 textO,
