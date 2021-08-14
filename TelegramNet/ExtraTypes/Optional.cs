@@ -2,7 +2,7 @@ using System;
 
 namespace TelegramNet.ExtraTypes
 {
-    public struct Optional<T>
+    public readonly struct Optional<T>
     {
 	    private readonly T _value;
 
