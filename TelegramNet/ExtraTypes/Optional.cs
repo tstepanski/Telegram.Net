@@ -5,46 +5,33 @@ namespace TelegramNet.ExtraTypes
     public struct Optional<T>
     {
 	    private readonly T _value;
-	    
-        public override int GetHashCode()
+
+	    public Optional(T value)
+	    {
+		    if (value != null)
+		    {
+			    _value = value;
+			    HasValue = true;
+		    }
+		    else
+		    {
+			    _value = default;
+			    HasValue = false;
+		    }
+	    }
+
+	    public bool HasValue { get; }
+
+	    public T Value => HasValue ? _value : throw new InvalidOperationException();
+
+	    public override int GetHashCode()
         {
             return HashCode.Combine(_value, HasValue);
         }
 
         public override string ToString()
         {
-            return $"{(HasValue ? _value.ToString() : "NoVal")}";
-        }
-
-        public bool HasValue { get; }
-
-        public T Value
-        {
-            get
-            {
-                if (HasValue)
-                {
-	                return _value;
-                }
-                else
-                {
-	                throw new InvalidOperationException();
-                }
-            }
-        }
-
-        public Optional(T value)
-        {
-            if (value != null)
-            {
-                this._value = value;
-                HasValue = true;
-            }
-            else
-            {
-                this._value = value;
-                HasValue = false;
-            }
+            return HasValue ? _value.ToString() : "NoVal";
         }
 
         public T GetValueForce()
@@ -52,29 +39,9 @@ namespace TelegramNet.ExtraTypes
             return !HasValue ? default : _value;
         }
 
-        public static explicit operator T(Optional<T> optional)
-        {
-            return optional.Value;
-        }
-
-        public static implicit operator Optional<T>(T value)
-        {
-            if (value != null)
-            {
-	            return new Optional<T>(value);
-            }
-
-            return new Optional<T>(default);
-        }
-
         public override bool Equals(object obj)
         {
-            if (obj is Optional<T>)
-            {
-	            return Equals((Optional<T>) obj);
-            }
-
-            return false;
+	        return obj is Optional<T> optional && Equals(optional);
         }
 
         public bool Equals(Optional<T> other)
@@ -85,6 +52,16 @@ namespace TelegramNet.ExtraTypes
             }
 
             return HasValue == other.HasValue;
+        }
+
+        public static explicit operator T(Optional<T> optional)
+        {
+	        return optional.Value;
+        }
+
+        public static implicit operator Optional<T>(T value)
+        {
+	        return value == null ? new Optional<T>(default) : new Optional<T>(value);
         }
 
         public static bool operator ==(Optional<T> left, Optional<T> right)
