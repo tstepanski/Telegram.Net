@@ -30,7 +30,7 @@ namespace TelegramNet
 		/// Constructor for an abstract class. 
 		/// </summary>
 		/// <param name="token">Telegram bot's token</param>
-		public BaseTelegramClient(string token)
+		protected BaseTelegramClient(string token)
 		{
 			TelegramApi = new TelegramApiClient(token);
 			_worker = new UpdatingWorker(this);
