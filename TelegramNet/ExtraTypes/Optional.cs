@@ -4,6 +4,8 @@ namespace TelegramNet.ExtraTypes
 {
     public struct Optional<T>
     {
+	    private readonly T _value;
+	    
         public override int GetHashCode()
         {
             return HashCode.Combine(_value, HasValue);
@@ -15,7 +17,6 @@ namespace TelegramNet.ExtraTypes
         }
 
         public bool HasValue { get; }
-        private T _value;
 
         public T Value
         {
