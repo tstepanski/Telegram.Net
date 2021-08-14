@@ -1,5 +1,3 @@
-using System;
-
 namespace TelegramNet.Enums
 {
     internal static class ParseModeInterpreter

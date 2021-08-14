@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using TelegramNet.Types.Inlines;
 
 namespace TelegramNet.Types
 {

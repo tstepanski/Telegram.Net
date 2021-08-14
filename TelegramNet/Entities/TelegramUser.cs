@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using TelegramNet.Entities.Interfaces;
-using TelegramNet.Entities.Keyboards;
 using TelegramNet.Entities.Keyboards.Inlines;
 using TelegramNet.Entities.Keyboards.Replies;
 using TelegramNet.Enums;
