@@ -8,126 +8,129 @@ using TelegramNet.Helpers;
 
 namespace Test
 {
-    public class TgTest
-    {
-        [Test]
-        public async Task SendingMessageTest()
-        {
-            var client = new TelegramClient("1710474838:AAG5g9lWry0hNYX0i-RAmjBSbNB47_D6s3g");
+	public sealed class TgTest
+	{
+		[Test]
+		public async Task SendingMessageTest()
+		{
+			var client = new TelegramClient("1710474838:AAG5g9lWry0hNYX0i-RAmjBSbNB47_D6s3g");
 
-            var chat = await client.GetChatAsync(640800833);
+			var chat = await client.GetChatAsync(640800833);
 
-            Assert.IsNotNull(chat);
+			Assert.IsNotNull(chat);
 
-            var mess = await chat.SendMessageAsync(text: "hello");
+			var message = await chat.SendMessageAsync("hello", keyboard: null);
 
-            Assert.IsTrue(mess.Text == "hello");
-        }
+			Assert.IsTrue(message?.Text == "hello");
+		}
 
-        [Test]
-        public async Task EditingMessageTest()
-        {
-            var client = new TelegramClient("1710474838:AAG5g9lWry0hNYX0i-RAmjBSbNB47_D6s3g");
-            var chat = await client.GetChatAsync(640800833);
+		[Test]
+		public async Task EditingMessageTest()
+		{
+			var client = new TelegramClient("1710474838:AAG5g9lWry0hNYX0i-RAmjBSbNB47_D6s3g");
+			var chat = await client.GetChatAsync(640800833);
 
-            Assert.IsNotNull(chat);
+			Assert.IsNotNull(chat);
 
-            var mess = await chat.SendMessageAsync(text: "hello");
+			var message = await chat.SendMessageAsync("hello", keyboard: null);
+			var edited = await message.EditTextAsync(new MessageTextEditor().WithText("edited"));
 
-            var edited = await mess.EditTextAsync(new MessageTextEditor().WithText("edited"));
+			Assert.IsTrue(edited);
+		}
 
-            Assert.IsTrue(edited);
-        }
+		[Test]
+		public async Task InlineReplyMarkupTest()
+		{
+			var client = new TelegramClient("1710474838:AAG5g9lWry0hNYX0i-RAmjBSbNB47_D6s3g");
+			var chat = await client.GetChatAsync(640800833);
 
-        [Test]
-        public async Task InlineReplyMarkupTest()
-        {
-            var client = new TelegramClient("1710474838:AAG5g9lWry0hNYX0i-RAmjBSbNB47_D6s3g");
-            var chat = await client.GetChatAsync(640800833);
+			Assert.IsNotNull(chat);
 
-            Assert.IsNotNull(chat);
+#pragma warning disable 618
+			var mess = await chat.SendMessageAsync("Inline markup test",
+				ParseMode.MarkdownV2,
+				new InlineKeyboardMarkup(new[]
+				{
+					new InlineKeyboardButton("Inline test!",
+						callbackData: "Callback")
+				}));
+#pragma warning restore 618
 
-            var mess = await chat.SendMessageAsync(text: "Inline markup test",
-                ParseMode.MarkdownV2,
-                new InlineKeyboardMarkup(new[]
-                {
-                    new InlineKeyboardButton("Inline test!",
-                        callbackData: "Callback")
-                }));
+			Assert.IsNotNull(mess);
+		}
 
-            Assert.IsNotNull(mess);
-        }
+		[Test]
+		public async Task RemovingInlineTest()
+		{
+			var client = new TelegramClient("1710474838:AAG5g9lWry0hNYX0i-RAmjBSbNB47_D6s3g");
+			var chat = await client.GetChatAsync(640800833);
 
-        [Test]
-        public async Task RemovingInlineTest()
-        {
-            var client = new TelegramClient("1710474838:AAG5g9lWry0hNYX0i-RAmjBSbNB47_D6s3g");
-            var chat = await client.GetChatAsync(640800833);
+			Assert.IsNotNull(chat);
 
-            Assert.IsNotNull(chat);
+#pragma warning disable 618
+			var nessage = await chat.SendMessageAsync("Inline markup test",
+				ParseMode.MarkdownV2,
+				new InlineKeyboardMarkup(new[]
+				{
+					new InlineKeyboardButton("Inline test!",
+						callbackData: "Callback")
+				}));
+#pragma warning restore 618
 
-            var mess = await chat.SendMessageAsync(text: "Inline markup test",
-                ParseMode.MarkdownV2,
-                new InlineKeyboardMarkup(new[]
-                {
-                    new InlineKeyboardButton("Inline test!",
-                        callbackData: "Callback")
-                }));
+			var res = await nessage.RemoveKeyboardAsync();
+			Assert.IsTrue(res);
+		}
 
-            var res = await mess.RemoveKeyboardAsync();
-            Assert.IsTrue(res);
-        }
+		[Test]
+		public async Task ReplyKeyboardTest()
+		{
+			var client = new TelegramClient("1710474838:AAG5g9lWry0hNYX0i-RAmjBSbNB47_D6s3g");
 
-        [Test]
-        public async Task ReplyKeyboardTest()
-        {
-            var client = new TelegramClient("1710474838:AAG5g9lWry0hNYX0i-RAmjBSbNB47_D6s3g");
+			var mess = await client.SendMessageAsync(640800833,
+				"Inline markup test",
+				ParseMode.MarkdownV2,
+				new ReplyKeyboardMarkup(new[]
+				{
+					new[]
+					{
+						new KeyboardButton("Test")
+					}
+				}));
 
-            var mess = await client.SendMessageAsync(640800833,
-                "Inline markup test",
-                ParseMode.MarkdownV2,
-                new ReplyKeyboardMarkup(new[]
-                {
-                    new[]
-                    {
-                        new KeyboardButton("Test")
-                    }
-                }));
+			Assert.IsNotNull(mess);
+		}
 
-            Assert.IsNotNull(mess);
-        }
+		[Test]
+		public async Task BuilderTest()
+		{
+			var client = new TelegramClient("1710474838:AAG5g9lWry0hNYX0i-RAmjBSbNB47_D6s3g");
 
-        [Test]
-        public async Task BuilderTest()
-        {
-            var client = new TelegramClient("1710474838:AAG5g9lWry0hNYX0i-RAmjBSbNB47_D6s3g");
+			var mess = await client.SendMessageAsync(640800833,
+				"Reply markup test",
+				ParseMode.MarkdownV2,
+				new ReplyKeyboardMarkup(ReplyKeyboardMarkup.Builder
+					.AddRow(
+						ReplyKeyboardMarkup.RowBuilder
+							.WithButton("Hello")
+							.WithButton("Test"))
+					.AddRow(
+						ReplyKeyboardMarkup.RowBuilder
+							.WithButton("Another row"))));
 
-            var mess = await client.SendMessageAsync(640800833,
-                "Reply markup test",
-                ParseMode.MarkdownV2,
-                new ReplyKeyboardMarkup(ReplyKeyboardMarkup.Builder
-                    .AddRow(
-                        ReplyKeyboardMarkup.RowBuilder
-                            .WithButton("Hello")
-                            .WithButton("Test"))
-                    .AddRow(
-                        ReplyKeyboardMarkup.RowBuilder
-                            .WithButton("Another row"))));
+			Assert.IsNotNull(mess);
 
-            Assert.IsNotNull(mess);
+			var mess1 = await client.SendMessageAsync(640800833,
+				"Inline markup test",
+				ParseMode.MarkdownV2,
+				keyboard: new InlineKeyboardMarkup(InlineKeyboardMarkup.Builder
+					.AddRow(
+						InlineKeyboardMarkup.RowBuilder
+							.WithButton(new InlineKeyboardButton("First row", callbackData: "First row")))
+					.AddRow(
+						InlineKeyboardMarkup.RowBuilder
+							.WithButton(new InlineKeyboardButton("Second row", callbackData: "Second row")))));
 
-            var mess1 = await client.SendMessageAsync(640800833,
-                "Inline markup test",
-                ParseMode.MarkdownV2,
-                keyboard: new InlineKeyboardMarkup(InlineKeyboardMarkup.Builder
-                    .AddRow(
-                        InlineKeyboardMarkup.RowBuilder
-                            .WithButton(new InlineKeyboardButton("First row", callbackData: "First row")))
-                    .AddRow(
-                        InlineKeyboardMarkup.RowBuilder
-                            .WithButton(new InlineKeyboardButton("Second row", callbackData: "Second row")))));
-
-            Assert.IsNotNull(mess1);
-        }
-    }
+			Assert.IsNotNull(mess1);
+		}
+	}
 }

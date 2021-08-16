@@ -1,37 +1,47 @@
 using System.Text.Json;
-using TelegramNet.ExtraTypes;
 
 namespace TelegramNet.Services.Http.Entities
 {
-    public class RequestResult<T>
-    {
-        internal RequestResult(HttpResult result)
-        {
-            Ok = result.Ok;
+	public sealed class RequestResult<T>
+	{
+		internal RequestResult(HttpResult result)
+		{
+			Ok = result.Ok;
 
-            Description = new Optional<string>(result.Description);
-            ErrorCode = new Optional<int>(result.ErrorCode);
-            if (Ok) Result = new Optional<T>(JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(result.Result)));
-        }
+			Description = result.Description;
+			ErrorCode = result.ErrorCode;
 
-        public bool Ok { get; internal init; }
+			if (!Ok)
+			{
+				return;
+			}
 
-        public Optional<string> Description { get; internal init; }
+			var resultJson = JsonSerializer.Serialize(result.Result);
 
-        public Optional<int> ErrorCode { get; internal init; }
+			Result = JsonSerializer.Deserialize<T>(resultJson);
+		}
 
-        public Optional<T> Result { get; internal init; }
+		public bool Ok { get; internal init; }
 
-        public bool IsSuccess()
-        {
-            return Ok && Result.HasValue;
-        }
+		public string? Description { get; internal init; }
 
-        public T EnsureSuccess()
-        {
-            if (IsSuccess()) return Result.Value;
+		public int? ErrorCode { get; internal init; }
 
-            throw new EnsureFailedException<T>(Description.Value ?? string.Empty);
-        }
-    }
+		public T? Result { get; internal init; }
+
+		public bool IsSuccess()
+		{
+			return Ok && Result != null;
+		}
+
+		public T EnsureSuccess()
+		{
+			if (IsSuccess())
+			{
+				return Result!;
+			}
+
+			throw new EnsureFailedException<T>(Description ?? string.Empty);
+		}
+	}
 }

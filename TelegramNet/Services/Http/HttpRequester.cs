@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -10,163 +9,204 @@ using TelegramNet.Services.Http.Entities;
 
 namespace TelegramNet.Services.Http
 {
-    public class HttpRequester
-    {
-        private readonly HttpClient _client;
-        private readonly string _token;
+	public sealed class HttpRequester
+	{
+		private readonly HttpClient _client;
+		private readonly string _token;
 
-        public HttpRequester(string token)
-        {
-            _client = new HttpClient();
-            _token = token;
-        }
+		public HttpRequester(string token)
+		{
+			_client = new HttpClient();
+			_token = token;
+		}
 
-        internal async Task<HttpResult> ExecuteMethodAsync(string methodName, HttpMethod method, string json = null)
-        {
-            if (methodName == null) throw new ArgumentNullException(nameof(methodName));
-            if (method == null) throw new ArgumentNullException(nameof(method));
+		internal async Task<HttpResult> ExecuteMethodAsync(string methodName, HttpMethod method, string? json = null)
+		{
+			if (methodName == null)
+			{
+				throw new ArgumentNullException(nameof(methodName));
+			}
 
-            try
-            {
-                var uri = LinkBuilder.Build(_token, methodName);
-                var message = new HttpRequestMessage {Method = method, RequestUri = uri};
+			if (method == null)
+			{
+				throw new ArgumentNullException(nameof(method));
+			}
+
+			try
+			{
+				var uri = LinkBuilder.Build(_token, methodName);
+				var message = new HttpRequestMessage { Method = method, RequestUri = uri };
 
 
-                if (!string.IsNullOrEmpty(json))
-                {
-                    var content = new StringContent(json);
-                    message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
-                    message.Content = content;
-                }
+				if (!string.IsNullOrEmpty(json))
+				{
+					var messageContent = new StringContent(json);
 
-                var response = await _client.SendAsync(message);
+					message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+					messageContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+					message.Content = messageContent;
+				}
 
-                var cont = await response.Content.ReadAsStringAsync();
+				var response = await _client.SendAsync(message);
+				var responseContent = await response.Content.ReadAsStringAsync();
 
-                return JsonSerializer.Deserialize<HttpResult>(cont);
-            }
-            catch (Exception e)
-            {
-                Logger.Log($"Failed executing {methodName}.", LogSource.Error);
-                return new HttpResult {Ok = false, Description = $"EXCEPTION\n{e}"};
-            }
-        }
+				return DeserializeHttpResult(responseContent);
+			}
+			catch (Exception exception)
+			{
+				Logger.Log($"Failed executing {methodName}.", LogSource.Error);
 
-        internal async Task<HttpResult> ExecuteMethodAsync(UriData data, HttpMethod method)
-        {
-            if (data == null) throw new ArgumentNullException(nameof(data));
-            if (method == null) throw new ArgumentNullException(nameof(method));
+				return new HttpResult { Ok = false, Description = $"EXCEPTION\n{exception}" };
+			}
+		}
 
-            try
-            {
-                var uri = data.Build(_token);
-                var message = new HttpRequestMessage {Method = method, RequestUri = uri};
+		internal async Task<HttpResult> ExecuteMethodAsync(UriData data, HttpMethod method)
+		{
+			if (data == null)
+			{
+				throw new ArgumentNullException(nameof(data));
+			}
 
-                var response = await _client.SendAsync(message);
+			if (method == null)
+			{
+				throw new ArgumentNullException(nameof(method));
+			}
 
-                var cont = await response.Content.ReadAsStringAsync();
+			try
+			{
+				var uri = data.Build(_token);
+				var message = new HttpRequestMessage { Method = method, RequestUri = uri };
+				var response = await _client.SendAsync(message);
+				var responseContent = await response.Content.ReadAsStringAsync();
 
-                return JsonSerializer.Deserialize<HttpResult>(cont);
-            }
-            catch (Exception e)
-            {
-                Logger.Log($"Failed executing method by uri {data.Build(_token)}.", LogSource.Error);
-                return new HttpResult {Ok = false, Description = $"EXCEPTION\n{e}"};
-            }
-        }
+				return DeserializeHttpResult(responseContent);
+			}
+			catch (Exception e)
+			{
+				Logger.Log($"Failed executing method by uri {data.Build(_token)}.", LogSource.Error);
 
-        internal HttpResult ExecuteMethod(string methodName, HttpMethod method, string json = null)
-        {
-            if (method == null) throw new ArgumentNullException(nameof(method));
-            if (methodName == null) throw new ArgumentNullException(nameof(methodName));
+				return new HttpResult { Ok = false, Description = $"EXCEPTION\n{e}" };
+			}
+		}
 
-            try
-            {
-                var uri = LinkBuilder.Build(_token, methodName);
-                var message = new HttpRequestMessage {Method = method, RequestUri = uri};
+		internal HttpResult ExecuteMethod(string methodName, HttpMethod method, string? json = null)
+		{
+			if (method == null)
+			{
+				throw new ArgumentNullException(nameof(method));
+			}
 
-                if (!string.IsNullOrEmpty(json))
-                {
-                    var content = new StringContent(json);
-                    message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
-                    message.Content = content;
-                }
+			if (methodName == null)
+			{
+				throw new ArgumentNullException(nameof(methodName));
+			}
 
-                var response = _client.Send(message);
+			try
+			{
+				var uri = LinkBuilder.Build(_token, methodName);
+				var message = new HttpRequestMessage { Method = method, RequestUri = uri };
 
-                using var stream = response.Content.ReadAsStream();
+				if (!string.IsNullOrEmpty(json))
+				{
+					var messageContent = new StringContent(json);
 
-                var contentBytes = new byte[stream.Length];
+					message.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+					messageContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+					message.Content = messageContent;
+				}
 
-                stream.Read(contentBytes, 0, contentBytes.Length);
+				var response = _client.Send(message);
+				byte[] contentBytes;
 
-                var cont = Encoding.UTF8.GetString(contentBytes);
+				using (var stream = response.Content.ReadAsStream())
+				{
+					contentBytes = new byte[stream.Length];
 
-                return JsonSerializer.Deserialize<HttpResult>(cont);
-            }
-            catch (Exception e)
-            {
-                Logger.Log($"Failed executing {methodName}", LogSource.Error);
-                return new HttpResult {Ok = false, Description = $"EXCEPTION\n{e}"};
-            }
-        }
+					stream.Read(contentBytes, 0, contentBytes.Length);
+				}
 
-        internal HttpResult ExecuteMethod(UriData data, HttpMethod method)
-        {
-            if (method == null) throw new ArgumentNullException(nameof(method));
-            if (data == null) throw new ArgumentNullException(nameof(data));
+				var responseContent = Encoding.UTF8.GetString(contentBytes);
 
-            try
-            {
-                var uri = data.Build(_token);
-                var message = new HttpRequestMessage {Method = method, RequestUri = uri};
+				return DeserializeHttpResult(responseContent);
+			}
+			catch (Exception exception)
+			{
+				Logger.Log($"Failed executing {methodName}", LogSource.Error);
+				return new HttpResult { Ok = false, Description = $"EXCEPTION\n{exception}" };
+			}
+		}
 
-                var response = _client.Send(message);
+		internal HttpResult ExecuteMethod(UriData data, HttpMethod method)
+		{
+			if (method == null)
+			{
+				throw new ArgumentNullException(nameof(method));
+			}
 
-                using var stream = response.Content.ReadAsStream();
+			if (data == null)
+			{
+				throw new ArgumentNullException(nameof(data));
+			}
 
-                var contentBytes = new byte[stream.Length];
+			try
+			{
+				var uri = data.Build(_token);
+				var message = new HttpRequestMessage { Method = method, RequestUri = uri };
+				var response = _client.Send(message);
+				byte[] contentBytes;
 
-                stream.Read(contentBytes, 0, contentBytes.Length);
+				using (var stream = response.Content.ReadAsStream())
+				{
+					contentBytes = new byte[stream.Length];
 
-                var cont = Encoding.UTF8.GetString(contentBytes);
+					stream.Read(contentBytes, 0, contentBytes.Length);
+				}
 
-                return JsonSerializer.Deserialize<HttpResult>(cont);
-            }
-            catch (Exception e)
-            {
-                Logger.Log($"Failed executing method by uri {data.Build(_token)}.", LogSource.Error);
-                return new HttpResult {Ok = false, Description = $"EXCEPTION\n{e}"};
-            }
-        }
+				var responseContent = Encoding.UTF8.GetString(contentBytes);
 
-        public RequestResult<T> ExecuteMethod<T>(string methodName, HttpMethod method, string json = null)
-        {
-            return new(ExecuteMethod(methodName, method, json));
-        }
+				return DeserializeHttpResult(responseContent);
+			}
+			catch (Exception e)
+			{
+				Logger.Log($"Failed executing method by uri {data.Build(_token)}.", LogSource.Error);
 
-        public RequestResult<T> ExecuteMethod<T>(UriData data, HttpMethod method)
-        {
-            return new(ExecuteMethod(data, method));
-        }
+				return new HttpResult { Ok = false, Description = $"EXCEPTION\n{e}" };
+			}
+		}
 
-        /// <summary>
-        /// Executes Telegram's API method.
-        /// </summary>
-        /// <param name="methodName">Method name</param>
-        /// <param name="method">GET, POST.</param>
-        /// <param name="json">JSON body</param>
-        public async Task<RequestResult<T>> ExecuteMethodAsync<T>(string methodName, HttpMethod method,
-            string json = null)
-        {
-            return new(await ExecuteMethodAsync(methodName, method, json));
-        }
+		private static HttpResult DeserializeHttpResult(string responseContent)
+		{
+			return JsonSerializer.Deserialize<HttpResult>(responseContent) ??
+			       throw new InvalidOperationException($@"Failed to deserialize {nameof(HttpResult)}");
+		}
 
-        public async Task<RequestResult<T>> ExecuteMethodAsync<T>(UriData data, HttpMethod method)
-        {
-            return new(await ExecuteMethodAsync(data, method));
-        }
-    }
+		public RequestResult<T> ExecuteMethod<T>(string methodName, HttpMethod method, string? json = null)
+		{
+			var result = ExecuteMethod(methodName, method, json);
+
+			return new RequestResult<T>(result);
+		}
+
+		public RequestResult<T> ExecuteMethod<T>(UriData data, HttpMethod method)
+		{
+			return new RequestResult<T>(ExecuteMethod(data, method));
+		}
+
+		/// <summary>
+		/// Executes Telegram's API method.
+		/// </summary>
+		/// <param name="methodName">Method name</param>
+		/// <param name="method">GET, POST.</param>
+		/// <param name="json">JSON body</param>
+		public async Task<RequestResult<T>> ExecuteMethodAsync<T>(string methodName, HttpMethod method,
+			string? json = null)
+		{
+			return new RequestResult<T>(await ExecuteMethodAsync(methodName, method, json));
+		}
+
+		public async Task<RequestResult<T>> ExecuteMethodAsync<T>(UriData data, HttpMethod method)
+		{
+			return new RequestResult<T>(await ExecuteMethodAsync(data, method));
+		}
+	}
 }

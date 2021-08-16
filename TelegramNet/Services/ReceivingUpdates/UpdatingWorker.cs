@@ -1,67 +1,68 @@
 using System;
 using System.Linq;
 using System.Net.Http;
-using System.Threading;
+using System.Threading.Tasks;
 using TelegramNet.Helpers;
 using TelegramNet.Logging;
 
 namespace TelegramNet.Services.ReceivingUpdates
 {
-    internal class UpdatingWorker
-    {
-        private int lastId = 0;
+	internal sealed class UpdatingWorker
+	{
+		private static readonly TimeSpan OneSecond = TimeSpan.FromSeconds(1);
+		private readonly TelegramApiClient _api;
+		private int _lastId;
+		private bool _stopped;
 
-        public UpdatingWorker(BaseTelegramClient client)
-        {
-            _api = client.TelegramApi;
-        }
+		public UpdatingWorker(BaseTelegramClient client)
+		{
+			_api = client.TelegramApi;
+		}
 
-        private bool _stop;
-        private Thread _thr;
-        private readonly TelegramApiClient _api;
+		public async Task StartUpdatingThreadAsync(UpdateConfig config, Action<Update[]> onUpdate)
+		{
+			var pingReqNeed = true;
 
-        public void StartUpdatingThread(UpdateConfig config, Action<Update[]> onUpdate)
-        {
-            var pongReqNeed = true;
-            _stop = false;
-            _thr = new Thread(async () =>
-            {
-                while (!_stop)
-                {
-                    config.Offset = lastId + 1;
-                    var response =
-                        await _api.RequestAsync<Update[]>("getUpdates", HttpMethod.Get, config.ToJson());
+			_stopped = false;
 
-                    if (response != null)
-                    {
-                        if (pongReqNeed)
-                        {
-                            Logger.Log($"First update response got. Count: {response.Length}.",
-                                LogSource.TelegramApiServer);
-                            pongReqNeed = false;
-                        }
+			while (!_stopped)
+			{
+				config.Offset = _lastId + 1;
 
-                        if (response.Length > 0)
-                            lastId = response.Select(x => x.UpdateId).OrderByDescending(x => x).First();
+				var response =
+					await _api.RequestAsync<Update[]?>("getUpdates", HttpMethod.Get, config.ToJson());
 
-                        onUpdate?.Invoke(response);
-                    }
-                    else
-                    {
-                        Logger.Log("Telegram API server is unavailable now.", LogSource.Warn);
-                        pongReqNeed = false;
-                    }
+				if (response != null)
+				{
+					if (pingReqNeed)
+					{
+						Logger.Log($"First update response got. Count: {response.Length}.",
+							LogSource.TelegramApiServer);
 
-                    Thread.Sleep(TimeSpan.FromSeconds(1));
-                }
-            });
+						pingReqNeed = false;
+					}
 
-            _thr.Start();
-        }
+					if (response.Length > 0)
+					{
+						_lastId = response.Select(x => x.UpdateId).OrderByDescending(x => x).First();
+					}
 
-        public void StopUpdatingThread()
-        {
-            _stop = true;
-        }
-    }
+					onUpdate?.Invoke(response);
+				}
+				else
+				{
+					Logger.Log("Telegram API server is unavailable now.", LogSource.Warn);
+
+					pingReqNeed = false;
+				}
+
+				await Task.Delay(OneSecond);
+			}
+		}
+
+		public void StopUpdatingThread()
+		{
+			_stopped = true;
+		}
+	}
 }

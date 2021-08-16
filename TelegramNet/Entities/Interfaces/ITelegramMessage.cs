@@ -1,42 +1,41 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using TelegramNet.ExtraTypes;
 
 namespace TelegramNet.Entities.Interfaces
 {
-    public interface ITelegramMessage
-    {
-        public int Id { get; }
-        public Optional<TelegramUser> Author { get; }
-        public Optional<TelegramChat> SenderChat { get; }
-        public Optional<DateTime> Timestamp { get; }
-        public Optional<string> Text { get; }
-        public TelegramChat Chat { get; }
-        public Optional<TelegramUser> ForwardFrom { get; }
-        public Optional<TelegramChat> ForwardFromChat { get; }
-        public Optional<IEnumerable<MessageCaption>> Captions { get; }
+	public interface ITelegramMessage
+	{
+		public int Id { get; }
+		public TelegramUser? Author { get; }
+		public TelegramChat? SenderChat { get; }
+		public DateTime? Timestamp { get; }
+		public string? Text { get; }
+		public TelegramChat Chat { get; }
+		public TelegramUser? ForwardFrom { get; }
+		public TelegramChat? ForwardFromChat { get; }
+		public IEnumerable<MessageCaption>? Captions { get; }
 
-        public Optional<int> ForwardFromMessageId { get; }
+		public int? ForwardFromMessageId { get; }
 
-        public Optional<string> ForwardSignature { get; }
+		public string? ForwardSignature { get; }
 
-        public Optional<string> ForwardSenderName { get; }
+		public string? ForwardSenderName { get; }
 
-        public Optional<DateTime> ForwardDate { get; }
+		public DateTime? ForwardDate { get; }
 
-        public Optional<TelegramMessage> ReplyToMessage { get; }
+		public TelegramMessage? ReplyToMessage { get; }
 
-        public Optional<TelegramUser> ViaBot { get; }
+		public TelegramUser? ViaBot { get; }
 
-        public Optional<DateTime> EditDate { get; }
+		public DateTime? EditDate { get; }
 
-        public Optional<string> MediaGroupId { get; }
+		public string? MediaGroupId { get; }
 
-        public Optional<string> AuthorSignature { get; }
+		public string? AuthorSignature { get; }
 
-        public Optional<IEnumerable<MessageCaption>> Entities { get; }
+		public IEnumerable<MessageCaption>? Entities { get; }
 
-        public Task<bool> DeleteAsync();
-    }
+		public Task<bool> DeleteAsync();
+	}
 }

@@ -15,336 +15,349 @@ using TelegramNet.Types;
 
 namespace TelegramNet
 {
-    /// <summary>
-    /// Telegram client. Base implementation of <see cref="BaseTelegramClient"/>.
-    /// </summary>
-    public class TelegramClient : BaseTelegramClient
-    {
-        public TelegramClient(string token, bool loggingToConsole = false) : base(token)
-        {
-            _requester = new HttpRequester(token);
-            ExtClient = new TelegramExtensionClient(this);
+	/// <summary>
+	/// Telegram client. Base implementation of <see cref="BaseTelegramClient"/>.
+	/// </summary>
+	public sealed class TelegramClient : BaseTelegramClient
+	{
+		private readonly HttpRequester _requester;
 
-            Logger.UseConsole(loggingToConsole);
-            OnUpdateReceived += OnUpdate;
-        }
+		public TelegramClient(string token, bool loggingToConsole = false) : base(token)
+		{
+			_requester = new HttpRequester(token);
+			ExtClient = new TelegramExtensionClient(this);
 
-        private readonly HttpRequester _requester;
+			Logger.UseConsole(loggingToConsole);
+			OnUpdateReceived += OnUpdate;
+		}
 
-        #region ~EVENTS~
+		#region ~PROPERTIES~
 
-        #region ~DELEGATES~
+		/// <inheritdoc/>
+		public override SelfUser? Me
+		{
+			get
+			{
+				var me = _requester.ExecuteMethod<ApiUser>("getMe", HttpMethod.Get);
 
-        public delegate Task MessageActionHandler(TelegramMessage message);
+				return me.Ok && me.Result != null
+					? new SelfUser(this, me.Result)
+					: null;
+			}
+		}
 
-        #endregion
+		#endregion
 
-        /// <summary>
-        /// Fires when the client has received a new message. Needs pooling (<see cref="BaseTelegramClient.Start()"/>).
-        /// </summary>
-        public event MessageActionHandler OnMessageReceived;
+		#region ~EVENTS~
 
-        /// <summary>
-        /// Fires when the message has edited. Needs pooling (<see cref="BaseTelegramClient.Start()"/>).
-        /// </summary>
-        public event MessageActionHandler OnMessageEdited;
+		#region ~DELEGATES~
 
-        /// <summary>
-        /// Fires when the client has received a new post. Needs pooling (<see cref="BaseTelegramClient.Start()"/>).
-        /// </summary>
-        public event MessageActionHandler OnChannelPost;
+		public delegate Task MessageActionHandler(TelegramMessage message);
 
-        /// <summary>
-        /// Fires when the post has edited. Needs pooling (<see cref="BaseTelegramClient.Start()"/>).
-        /// </summary>
-        public event MessageActionHandler OnChannelPostEdited;
+		#endregion
 
-        #region ~EVENT WORKERS~
+		/// <summary>
+		/// Fires when the client has received a new message. Needs pooling (<see cref="BaseTelegramClient.Start()"/>).
+		/// </summary>
+		public event MessageActionHandler? OnMessageReceived;
 
-        private Task OnUpdate(TelegramUpdate[] updates)
-        {
-            foreach (var update in updates)
-            {
-                if (update.Message != null) OnMessageReceived?.Invoke(update.Message);
+		/// <summary>
+		/// Fires when the message has edited. Needs pooling (<see cref="BaseTelegramClient.Start()"/>).
+		/// </summary>
+		public event MessageActionHandler? OnMessageEdited;
 
-                if (update.EditedMessage != null) OnMessageEdited?.Invoke(update.EditedMessage);
+		/// <summary>
+		/// Fires when the client has received a new post. Needs pooling (<see cref="BaseTelegramClient.Start()"/>).
+		/// </summary>
+		public event MessageActionHandler? OnChannelPost;
 
-                if (update.ChannelPost != null) OnChannelPost?.Invoke(update.ChannelPost);
+		/// <summary>
+		/// Fires when the post has edited. Needs pooling (<see cref="BaseTelegramClient.Start()"/>).
+		/// </summary>
+		public event MessageActionHandler? OnChannelPostEdited;
 
-                if (update.EditedChannelPost != null) OnChannelPostEdited?.Invoke(update.EditedChannelPost);
-            }
+		#region ~EVENT WORKERS~
 
-            return Task.CompletedTask;
-        }
+		private Task OnUpdate(TelegramUpdate[] updates)
+		{
+			foreach (var update in updates)
+			{
+				if (update.Message != null)
+				{
+					OnMessageReceived?.Invoke(update.Message);
+				}
 
-        #endregion
+				if (update.EditedMessage != null)
+				{
+					OnMessageEdited?.Invoke(update.EditedMessage);
+				}
 
-        #endregion
+				if (update.ChannelPost != null)
+				{
+					OnChannelPost?.Invoke(update.ChannelPost);
+				}
 
-        #region ~PROPERTIES~
+				if (update.EditedChannelPost != null)
+				{
+					OnChannelPostEdited?.Invoke(update.EditedChannelPost);
+				}
+			}
 
-        /// <inheritdoc/>
-        public override SelfUser Me
-        {
-            get
-            {
-                var me = _requester.ExecuteMethod<ApiUser>("getMe", HttpMethod.Get);
+			return Task.CompletedTask;
+		}
 
-                return me.Ok ? new SelfUser(this, me.Result.Value) : null;
-            }
-        }
+		#endregion
 
-        #endregion
+		#endregion
 
-        #region ~METHODS~
+		#region ~METHODS~
 
-        /// <inheritdoc/>
-        public override async Task<TelegramChat> GetChatAsync(ChatId chat)
-        {
-            return new(this, await TelegramApi.RequestAsync<ApiChat>("getChat", HttpMethod.Get,
-                new Dictionary<string, object>
-                {
-                    {"chat_id", chat.Fetch()}
-                }.ToJson()));
-        }
+		/// <inheritdoc/>
+		public override async Task<TelegramChat> GetChatAsync(ChatId chat)
+		{
+			return new TelegramChat(this, await TelegramApi.RequestAsync<ApiChat>("getChat", HttpMethod.Get,
+				new Dictionary<string, object?>
+				{
+					{ "chat_id", chat.Fetch() }
+				}.ToJson()));
+		}
 
-        /// <inheritdoc/>
-        [Obsolete("This method is obsolete. Use method SendMessageAsync with IKeyboard implementation.")]
-        public override async Task<TelegramClientMessage> SendMessageAsync(ChatId chat,
-            string text,
-            ParseMode mode = ParseMode.MarkdownV2,
-            InlineKeyboardMarkup inlineMarkup = null,
-            ReplyKeyboardMarkup replyMarkup = null)
-        {
-            object toSerialize = inlineMarkup == null
-                ? replyMarkup == null ? new
-                {
-                    chat_id = chat.Fetch(),
-                    text,
-                    parse_mode = mode.ToApiString()
-                }
-                : new
-                {
-                    chat_id = chat.Fetch(),
-                    text,
-                    parse_mode = mode.ToApiString(),
-                    reply_markup = (replyMarkup as IApiFormatable).GetApiFormat()
-                }
-                : new
-                {
-                    chat_id = chat.Fetch(),
-                    text,
-                    parse_mode = mode.ToApiString(),
-                    reply_markup = (inlineMarkup as IApiFormatable).GetApiFormat()
-                };
+		/// <inheritdoc/>
+		[Obsolete("This method is obsolete. Use method SendMessageAsync with IKeyboard implementation.")]
+		public override async Task<TelegramClientMessage> SendMessageAsync(ChatId chat,
+			string text,
+			ParseMode mode = ParseMode.MarkdownV2,
+			InlineKeyboardMarkup? inlineMarkup = null,
+			ReplyKeyboardMarkup? replyMarkup = null)
+		{
+			object toSerialize = inlineMarkup == null
+				? replyMarkup == null ? new
+				{
+					chat_id = chat.Fetch(),
+					text,
+					parse_mode = mode.ToApiString()
+				}
+				: new
+				{
+					chat_id = chat.Fetch(),
+					text,
+					parse_mode = mode.ToApiString(),
+					reply_markup = (replyMarkup as IProvidesApiFormat).GetApiFormat()
+				}
+				: new
+				{
+					chat_id = chat.Fetch(),
+					text,
+					parse_mode = mode.ToApiString(),
+					reply_markup = (inlineMarkup as IProvidesApiFormat).GetApiFormat()
+				};
 
-            var message =
-                await TelegramApi.RequestAsync<ApiMessage>("sendMessage", HttpMethod.Post, toSerialize.ToJson());
+			var message =
+				await TelegramApi.RequestAsync<ApiMessage>("sendMessage", HttpMethod.Post, toSerialize.ToJson());
 
-            return new TelegramClientMessage(this, message, mode);
-        }
+			return new TelegramClientMessage(this, message, mode);
+		}
 
-        public override async Task<TelegramClientMessage> SendMessageAsync(ChatId id, string text,
-            ParseMode mode = ParseMode.MarkdownV2, IKeyboard keyboard = null)
-        {
-            object toSerialize = keyboard == null
-                ? new
-                {
-                    chat_id = id.Fetch(),
-                    text,
-                    parse_mode = mode.ToApiString()
-                }
-                : new
-                {
-                    chat_id = id.Fetch(),
-                    text,
-                    parse_mode = mode.ToApiString(),
-                    reply_markup = (keyboard as IApiFormatable)?.GetApiFormat()
-                };
+		public override async Task<TelegramClientMessage?> SendMessageAsync(ChatId id, string text,
+			ParseMode mode = ParseMode.MarkdownV2, IKeyboard? keyboard = null)
+		{
+			object toSerialize = keyboard == null
+				? new
+				{
+					chat_id = id.Fetch(),
+					text,
+					parse_mode = mode.ToApiString()
+				}
+				: new
+				{
+					chat_id = id.Fetch(),
+					text,
+					parse_mode = mode.ToApiString(),
+					reply_markup = (keyboard as IProvidesApiFormat)?.GetApiFormat()
+				};
 
-            var message =
-                await TelegramApi.RequestAsync<ApiMessage>("sendMessage", HttpMethod.Post, toSerialize.ToJson());
+			var message =
+				await TelegramApi.RequestAsync<ApiMessage>("sendMessage", HttpMethod.Post, toSerialize.ToJson());
 
-            return new TelegramClientMessage(this, message, mode);
-        }
+			return new TelegramClientMessage(this, message, mode);
+		}
 
-        [Obsolete("This method is obsolete. Use method SendDocumentAsync with IKeyboard implementation.")]
-        public override async Task<TelegramClientMessage> SendDocumentAsync(ChatId chat,
-            Uri fileUrl,
-            Uri thumbUri = null,
-            string caption = null,
-            ParseMode mode = ParseMode.MarkdownV2,
-            bool disableNotification = false,
-            int replyToMessageId = default,
-            bool allowSendingWithoutReply = false,
-            InlineKeyboardMarkup inlineMarkup = null,
-            ReplyKeyboardMarkup replyMarkup = null)
-        {
-            object toSerialize = inlineMarkup == null
-                ? replyMarkup == null ? new
-                {
-                    chat_id = chat.Fetch(),
-                    document = fileUrl.ToString(),
-                    thumb = thumbUri?.ToString(),
-                    parse_mode = mode.ToApiString(),
-                    caption,
-                    disable_notification = disableNotification,
-                    reply_to_message_id = replyToMessageId,
-                    allow_sending_without_reply = allowSendingWithoutReply
-                }
-                : new
-                {
-                    chat_id = chat.Fetch(),
-                    document = fileUrl.ToString(),
-                    thumb = thumbUri?.ToString(),
-                    parse_mode = mode.ToApiString(),
-                    caption,
-                    disable_notification = disableNotification,
-                    reply_to_message_id = replyToMessageId,
-                    allow_sending_without_reply = allowSendingWithoutReply,
-                    reply_markup = (replyMarkup as IApiFormatable).GetApiFormat()
-                }
-                : new
-                {
-                    chat_id = chat.Fetch(),
-                    document = fileUrl.ToString(),
-                    thumb = thumbUri?.ToString(),
-                    parse_mode = mode.ToApiString(),
-                    caption,
-                    disable_notification = disableNotification,
-                    reply_to_message_id = replyToMessageId,
-                    allow_sending_without_reply = allowSendingWithoutReply,
-                    reply_markup = (inlineMarkup as IApiFormatable).GetApiFormat()
-                };
+		[Obsolete("This method is obsolete. Use method SendDocumentAsync with IKeyboard implementation.")]
+		public override async Task<TelegramClientMessage> SendDocumentAsync(ChatId chat,
+			Uri fileUrl,
+			Uri? thumbUri = null,
+			string? caption = null,
+			ParseMode mode = ParseMode.MarkdownV2,
+			bool disableNotification = false,
+			int replyToMessageId = default,
+			bool allowSendingWithoutReply = false,
+			InlineKeyboardMarkup? inlineMarkup = null,
+			ReplyKeyboardMarkup? replyMarkup = null)
+		{
+			object toSerialize = inlineMarkup == null
+				? replyMarkup == null ? new
+				{
+					chat_id = chat.Fetch(),
+					document = fileUrl.ToString(),
+					thumb = thumbUri?.ToString(),
+					parse_mode = mode.ToApiString(),
+					caption,
+					disable_notification = disableNotification,
+					reply_to_message_id = replyToMessageId,
+					allow_sending_without_reply = allowSendingWithoutReply
+				}
+				: new
+				{
+					chat_id = chat.Fetch(),
+					document = fileUrl.ToString(),
+					thumb = thumbUri?.ToString(),
+					parse_mode = mode.ToApiString(),
+					caption,
+					disable_notification = disableNotification,
+					reply_to_message_id = replyToMessageId,
+					allow_sending_without_reply = allowSendingWithoutReply,
+					reply_markup = (replyMarkup as IProvidesApiFormat).GetApiFormat()
+				}
+				: new
+				{
+					chat_id = chat.Fetch(),
+					document = fileUrl.ToString(),
+					thumb = thumbUri?.ToString(),
+					parse_mode = mode.ToApiString(),
+					caption,
+					disable_notification = disableNotification,
+					reply_to_message_id = replyToMessageId,
+					allow_sending_without_reply = allowSendingWithoutReply,
+					reply_markup = (inlineMarkup as IProvidesApiFormat).GetApiFormat()
+				};
 
-            var message =
-                await TelegramApi.RequestAsync<ApiMessage>("sendDocument", HttpMethod.Post, toSerialize.ToJson());
+			var message =
+				await TelegramApi.RequestAsync<ApiMessage>("sendDocument", HttpMethod.Post, toSerialize.ToJson());
 
-            return new TelegramClientMessage(this, message, mode);
-        }
+			return new TelegramClientMessage(this, message, mode);
+		}
 
-        public override async Task<TelegramClientMessage> SendDocumentAsync(ChatId id, Uri fileUrl, Uri thumbUri = null,
-            string caption = null,
-            ParseMode parseMode = ParseMode.MarkdownV2, bool disableNotification = false,
-            int replyToMessageId = default,
-            bool allowSendingWithoutReply = false, IKeyboard keyboard = null)
-        {
-            object toSerialize = keyboard == null
-                ? new
-                {
-                    chat_id = id.Fetch(),
-                    document = fileUrl.ToString(),
-                    thumb = thumbUri?.ToString(),
-                    parse_mode = parseMode.ToApiString(),
-                    caption,
-                    disable_notification = disableNotification,
-                    reply_to_message_id = replyToMessageId,
-                    allow_sending_without_reply = allowSendingWithoutReply
-                }
-                : new
-                {
-                    chat_id = id.Fetch(),
-                    document = fileUrl.ToString(),
-                    thumb = thumbUri?.ToString(),
-                    parse_mode = parseMode.ToApiString(),
-                    caption,
-                    disable_notification = disableNotification,
-                    reply_to_message_id = replyToMessageId,
-                    allow_sending_without_reply = allowSendingWithoutReply,
-                    reply_markup = (keyboard as IApiFormatable)?.GetApiFormat()
-                };
+		public override async Task<TelegramClientMessage?> SendDocumentAsync(ChatId id, Uri fileUrl,
+			Uri? thumbUri = null, string? caption = null, ParseMode parseMode = ParseMode.MarkdownV2,
+			bool disableNotification = false, int replyToMessageId = default, bool allowSendingWithoutReply = false,
+			IKeyboard? keyboard = null)
+		{
+			object toSerialize = keyboard == null
+				? new
+				{
+					chat_id = id.Fetch(),
+					document = fileUrl.ToString(),
+					thumb = thumbUri?.ToString(),
+					parse_mode = parseMode.ToApiString(),
+					caption,
+					disable_notification = disableNotification,
+					reply_to_message_id = replyToMessageId,
+					allow_sending_without_reply = allowSendingWithoutReply
+				}
+				: new
+				{
+					chat_id = id.Fetch(),
+					document = fileUrl.ToString(),
+					thumb = thumbUri?.ToString(),
+					parse_mode = parseMode.ToApiString(),
+					caption,
+					disable_notification = disableNotification,
+					reply_to_message_id = replyToMessageId,
+					allow_sending_without_reply = allowSendingWithoutReply,
+					reply_markup = (keyboard as IProvidesApiFormat)?.GetApiFormat()
+				};
 
-            var message =
-                await TelegramApi.RequestAsync<ApiMessage>("sendDocument", HttpMethod.Post, toSerialize.ToJson());
+			var message =
+				await TelegramApi.RequestAsync<ApiMessage>("sendDocument", HttpMethod.Post, toSerialize.ToJson());
 
-            return new TelegramClientMessage(this, message, parseMode);
-        }
+			return new TelegramClientMessage(this, message, parseMode);
+		}
 
-        [Obsolete("This method is obsolete. Use method SendPhotoAsync with IKeyboard implementation.")]
-        public override async Task<TelegramClientMessage> SendPhotoAsync(ChatId chat,
-            Uri photoUrl,
-            string caption = null,
-            ParseMode parseMode = ParseMode.MarkdownV2,
-            bool disableNotification = false,
-            int replyToMessageId = default,
-            bool allowSendingWithoutReply = false,
-            InlineKeyboardMarkup inlineMarkup = null,
-            ReplyKeyboardMarkup replyMarkup = null)
-        {
-            object toSerialize = inlineMarkup == null
-                ? replyMarkup == null ? new
-                {
-                    chat_id = chat.Fetch(),
-                    photo = photoUrl.ToString(),
-                    parse_mode = parseMode.ToApiString(),
-                    caption,
-                    disable_notification = disableNotification,
-                    reply_to_message_id = replyToMessageId,
-                    allow_sending_without_reply = allowSendingWithoutReply
-                }
-                : new
-                {
-                    chat_id = chat.Fetch(),
-                    photo = photoUrl.ToString(),
-                    parse_mode = parseMode.ToApiString(),
-                    caption,
-                    disable_notification = disableNotification,
-                    reply_to_message_id = replyToMessageId,
-                    allow_sending_without_reply = allowSendingWithoutReply,
-                    reply_markup = (replyMarkup as IApiFormatable).GetApiFormat()
-                }
-                : new
-                {
-                    chat_id = chat.Fetch(),
-                    photo = photoUrl.ToString(),
-                    parse_mode = parseMode.ToApiString(),
-                    caption,
-                    disable_notification = disableNotification,
-                    reply_to_message_id = replyToMessageId,
-                    allow_sending_without_reply = allowSendingWithoutReply,
-                    reply_markup = (inlineMarkup as IApiFormatable).GetApiFormat()
-                };
+		[Obsolete("This method is obsolete. Use method SendPhotoAsync with IKeyboard implementation.")]
+		public override async Task<TelegramClientMessage> SendPhotoAsync(ChatId chat,
+			Uri photoUrl,
+			string? caption = null,
+			ParseMode parseMode = ParseMode.MarkdownV2,
+			bool disableNotification = false,
+			int replyToMessageId = default,
+			bool allowSendingWithoutReply = false,
+			InlineKeyboardMarkup? inlineMarkup = null,
+			ReplyKeyboardMarkup? replyMarkup = null)
+		{
+			object toSerialize = inlineMarkup == null
+				? replyMarkup == null ? new
+				{
+					chat_id = chat.Fetch(),
+					photo = photoUrl.ToString(),
+					parse_mode = parseMode.ToApiString(),
+					caption,
+					disable_notification = disableNotification,
+					reply_to_message_id = replyToMessageId,
+					allow_sending_without_reply = allowSendingWithoutReply
+				}
+				: new
+				{
+					chat_id = chat.Fetch(),
+					photo = photoUrl.ToString(),
+					parse_mode = parseMode.ToApiString(),
+					caption,
+					disable_notification = disableNotification,
+					reply_to_message_id = replyToMessageId,
+					allow_sending_without_reply = allowSendingWithoutReply,
+					reply_markup = (replyMarkup as IProvidesApiFormat).GetApiFormat()
+				}
+				: new
+				{
+					chat_id = chat.Fetch(),
+					photo = photoUrl.ToString(),
+					parse_mode = parseMode.ToApiString(),
+					caption,
+					disable_notification = disableNotification,
+					reply_to_message_id = replyToMessageId,
+					allow_sending_without_reply = allowSendingWithoutReply,
+					reply_markup = (inlineMarkup as IProvidesApiFormat).GetApiFormat()
+				};
 
-            var message =
-                await TelegramApi.RequestAsync<ApiMessage>("sendDocument", HttpMethod.Post, toSerialize.ToJson());
+			var message =
+				await TelegramApi.RequestAsync<ApiMessage>("sendDocument", HttpMethod.Post, toSerialize.ToJson());
 
-            return new TelegramClientMessage(this, message, parseMode);
-        }
+			return new TelegramClientMessage(this, message, parseMode);
+		}
 
-        public override async Task<TelegramClientMessage> SendPhotoAsync(ChatId id, Uri photoUrl, string caption = null,
-            ParseMode parseMode = ParseMode.MarkdownV2,
-            bool disableNotification = false, int replyToMessageId = default, bool allowSendingWithoutReply = false,
-            IKeyboard keyboard = null)
-        {
-            object toSerialize = keyboard == null
-                ? new
-                {
-                    chat_id = id.Fetch(),
-                    photo = photoUrl.ToString(),
-                    parse_mode = parseMode.ToApiString(),
-                    caption,
-                    disable_notification = disableNotification,
-                    reply_to_message_id = replyToMessageId,
-                    allow_sending_without_reply = allowSendingWithoutReply
-                }
-                : new
-                {
-                    chat_id = id.Fetch(),
-                    photo = photoUrl.ToString(),
-                    parse_mode = parseMode.ToApiString(),
-                    caption,
-                    disable_notification = disableNotification,
-                    reply_to_message_id = replyToMessageId,
-                    allow_sending_without_reply = allowSendingWithoutReply,
-                    reply_markup = (keyboard as IApiFormatable)?.GetApiFormat()
-                };
+		public override async Task<TelegramClientMessage?> SendPhotoAsync(ChatId id, Uri photoUrl,
+			string? caption = null, ParseMode parseMode = ParseMode.MarkdownV2,
+			bool disableNotification = false, int replyToMessageId = default, bool allowSendingWithoutReply = false,
+			IKeyboard? keyboard = null)
+		{
+			object toSerialize = keyboard == null
+				? new
+				{
+					chat_id = id.Fetch(),
+					photo = photoUrl.ToString(),
+					parse_mode = parseMode.ToApiString(),
+					caption,
+					disable_notification = disableNotification,
+					reply_to_message_id = replyToMessageId,
+					allow_sending_without_reply = allowSendingWithoutReply
+				}
+				: new
+				{
+					chat_id = id.Fetch(),
+					photo = photoUrl.ToString(),
+					parse_mode = parseMode.ToApiString(),
+					caption,
+					disable_notification = disableNotification,
+					reply_to_message_id = replyToMessageId,
+					allow_sending_without_reply = allowSendingWithoutReply,
+					reply_markup = (keyboard as IProvidesApiFormat)?.GetApiFormat()
+				};
 
-            var message =
-                await TelegramApi.RequestAsync<ApiMessage>("sendDocument", HttpMethod.Post, toSerialize.ToJson());
+			var message =
+				await TelegramApi.RequestAsync<ApiMessage>("sendDocument", HttpMethod.Post, toSerialize.ToJson());
 
-            return new TelegramClientMessage(this, message, parseMode);
-        }
+			return new TelegramClientMessage(this, message, parseMode);
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

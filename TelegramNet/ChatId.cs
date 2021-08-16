@@ -1,49 +1,53 @@
 namespace TelegramNet
 {
-    public class ChatId
-    {
-        public ChatId(string id)
-        {
-            Id = id;
-        }
+	public sealed class ChatId
+	{
+		public ChatId(string? id)
+		{
+			Id = id;
+		}
 
-        public ChatId(int id)
-        {
-            Id = id.ToString();
-        }
+		public ChatId(int id)
+		{
+			Id = id.ToString();
+		}
 
-        public string Id { get; }
+		public string? Id { get; }
 
-        public bool TryFetchInteger(out int id)
-        {
-            var able = int.TryParse(Id, out id);
+		public bool TryFetchInteger(out int id)
+		{
+			var able = int.TryParse(Id, out id);
 
-            return able;
-        }
+			return able;
+		}
 
-        internal object Fetch()
-        {
-            var isInteger = TryFetchInteger(out var id);
+		internal object? Fetch()
+		{
+			var isInteger = TryFetchInteger(out var id);
 
-            if (isInteger)
-                return id;
-            return Id;
-        }
+			if (isInteger)
+			{
+				return id;
+			}
 
-        public static implicit operator ChatId(string id)
-        {
-            return new(id);
-        }
+			return Id;
+		}
 
-        public static implicit operator ChatId(int id)
-        {
-            return new(id);
-        }
+		public static implicit operator ChatId(string? id)
+		{
+			return new ChatId(id);
+		}
 
-        internal static ChatId FromObject(object obj)
-        {
-            var value = obj.ToString();
-            return new ChatId(value);
-        }
-    }
+		public static implicit operator ChatId(int id)
+		{
+			return new ChatId(id);
+		}
+
+		internal static ChatId FromObject(object? obj)
+		{
+			var value = obj?.ToString() ?? string.Empty;
+
+			return new ChatId(value);
+		}
+	}
 }
