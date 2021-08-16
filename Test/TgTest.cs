@@ -1,4 +1,6 @@
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 using TelegramNet;
 using TelegramNet.Entities.Keyboards.Inlines;
@@ -13,7 +15,8 @@ namespace Test
 		[Test]
 		public async Task SendingMessageTest()
 		{
-			var client = new TelegramClient("1710474838:AAG5g9lWry0hNYX0i-RAmjBSbNB47_D6s3g");
+			var loggerMock = new Mock<ILogger>();
+			var client = new TelegramClient("1710474838:AAG5g9lWry0hNYX0i-RAmjBSbNB47_D6s3g", loggerMock.Object);
 
 			var chat = await client.GetChatAsync(640800833);
 
@@ -27,13 +30,14 @@ namespace Test
 		[Test]
 		public async Task EditingMessageTest()
 		{
-			var client = new TelegramClient("1710474838:AAG5g9lWry0hNYX0i-RAmjBSbNB47_D6s3g");
+			var loggerMock = new Mock<ILogger>();
+			var client = new TelegramClient("1710474838:AAG5g9lWry0hNYX0i-RAmjBSbNB47_D6s3g", loggerMock.Object);
 			var chat = await client.GetChatAsync(640800833);
 
 			Assert.IsNotNull(chat);
 
 			var message = await chat.SendMessageAsync("hello", keyboard: null);
-			var edited = await message.EditTextAsync(new MessageTextEditor().WithText("edited"));
+			var edited = await message!.EditTextAsync(new MessageTextEditor().WithText("edited"));
 
 			Assert.IsTrue(edited);
 		}
@@ -41,7 +45,8 @@ namespace Test
 		[Test]
 		public async Task InlineReplyMarkupTest()
 		{
-			var client = new TelegramClient("1710474838:AAG5g9lWry0hNYX0i-RAmjBSbNB47_D6s3g");
+			var loggerMock = new Mock<ILogger>();
+			var client = new TelegramClient("1710474838:AAG5g9lWry0hNYX0i-RAmjBSbNB47_D6s3g", loggerMock.Object);
 			var chat = await client.GetChatAsync(640800833);
 
 			Assert.IsNotNull(chat);
@@ -62,13 +67,14 @@ namespace Test
 		[Test]
 		public async Task RemovingInlineTest()
 		{
-			var client = new TelegramClient("1710474838:AAG5g9lWry0hNYX0i-RAmjBSbNB47_D6s3g");
+			var loggerMock = new Mock<ILogger>();
+			var client = new TelegramClient("1710474838:AAG5g9lWry0hNYX0i-RAmjBSbNB47_D6s3g", loggerMock.Object);
 			var chat = await client.GetChatAsync(640800833);
 
 			Assert.IsNotNull(chat);
 
 #pragma warning disable 618
-			var nessage = await chat.SendMessageAsync("Inline markup test",
+			var message = await chat.SendMessageAsync("Inline markup test",
 				ParseMode.MarkdownV2,
 				new InlineKeyboardMarkup(new[]
 				{
@@ -77,14 +83,15 @@ namespace Test
 				}));
 #pragma warning restore 618
 
-			var res = await nessage.RemoveKeyboardAsync();
+			var res = await message.RemoveKeyboardAsync();
 			Assert.IsTrue(res);
 		}
 
 		[Test]
 		public async Task ReplyKeyboardTest()
 		{
-			var client = new TelegramClient("1710474838:AAG5g9lWry0hNYX0i-RAmjBSbNB47_D6s3g");
+			var loggerMock = new Mock<ILogger>();
+			var client = new TelegramClient("1710474838:AAG5g9lWry0hNYX0i-RAmjBSbNB47_D6s3g", loggerMock.Object);
 
 			var mess = await client.SendMessageAsync(640800833,
 				"Inline markup test",
@@ -103,7 +110,8 @@ namespace Test
 		[Test]
 		public async Task BuilderTest()
 		{
-			var client = new TelegramClient("1710474838:AAG5g9lWry0hNYX0i-RAmjBSbNB47_D6s3g");
+			var loggerMock = new Mock<ILogger>();
+			var client = new TelegramClient("1710474838:AAG5g9lWry0hNYX0i-RAmjBSbNB47_D6s3g", loggerMock.Object);
 
 			var mess = await client.SendMessageAsync(640800833,
 				"Reply markup test",

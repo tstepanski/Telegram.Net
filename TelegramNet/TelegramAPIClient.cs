@@ -1,5 +1,6 @@
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using TelegramNet.Services.Http;
 using TelegramNet.Services.Http.Entities;
 
@@ -9,9 +10,9 @@ namespace TelegramNet
 	{
 		private readonly HttpRequester _requester;
 
-		public TelegramApiClient(string token)
+		public TelegramApiClient(string token, ILogger logger)
 		{
-			_requester = new HttpRequester(token);
+			_requester = new HttpRequester(token, logger);
 		}
 
 		public async Task<T> RequestAsync<T>(string route, HttpMethod method, string? json = null)

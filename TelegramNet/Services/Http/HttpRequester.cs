@@ -4,7 +4,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using TelegramNet.Logging;
+using Microsoft.Extensions.Logging;
 using TelegramNet.Services.Http.Entities;
 
 namespace TelegramNet.Services.Http
@@ -12,12 +12,14 @@ namespace TelegramNet.Services.Http
 	public sealed class HttpRequester
 	{
 		private readonly HttpClient _client;
+		private readonly ILogger _logger;
 		private readonly string _token;
 
-		public HttpRequester(string token)
+		public HttpRequester(string token, ILogger logger)
 		{
 			_client = new HttpClient();
 			_token = token;
+			_logger = logger;
 		}
 
 		internal async Task<HttpResult> ExecuteMethodAsync(string methodName, HttpMethod method, string? json = null)
@@ -54,9 +56,13 @@ namespace TelegramNet.Services.Http
 			}
 			catch (Exception exception)
 			{
-				Logger.Log($"Failed executing {methodName}.", LogSource.Error);
+				_logger.LogError(exception, $@"Failed executing {methodName}");
 
-				return new HttpResult { Ok = false, Description = $"EXCEPTION\n{exception}" };
+				return new HttpResult
+				{
+					Ok = false,
+					Description = $@"EXCEPTION\n{exception}"
+				};
 			}
 		}
 
@@ -81,11 +87,15 @@ namespace TelegramNet.Services.Http
 
 				return DeserializeHttpResult(responseContent);
 			}
-			catch (Exception e)
+			catch (Exception exception)
 			{
-				Logger.Log($"Failed executing method by uri {data.Build(_token)}.", LogSource.Error);
+				_logger.LogError(exception, $@"Failed executing method by uri {data.Build(_token)}.");
 
-				return new HttpResult { Ok = false, Description = $"EXCEPTION\n{e}" };
+				return new HttpResult
+				{
+					Ok = false,
+					Description = $@"EXCEPTION\n{exception}"
+				};
 			}
 		}
 
@@ -131,8 +141,13 @@ namespace TelegramNet.Services.Http
 			}
 			catch (Exception exception)
 			{
-				Logger.Log($"Failed executing {methodName}", LogSource.Error);
-				return new HttpResult { Ok = false, Description = $"EXCEPTION\n{exception}" };
+				_logger.LogError(exception, $@"Failed executing {methodName}");
+
+				return new HttpResult
+				{
+					Ok = false,
+					Description = $"EXCEPTION\n{exception}"
+				};
 			}
 		}
 
@@ -166,11 +181,15 @@ namespace TelegramNet.Services.Http
 
 				return DeserializeHttpResult(responseContent);
 			}
-			catch (Exception e)
+			catch (Exception exception)
 			{
-				Logger.Log($"Failed executing method by uri {data.Build(_token)}.", LogSource.Error);
+				_logger.LogError(exception, $@"Failed executing method by uri {data.Build(_token)}");
 
-				return new HttpResult { Ok = false, Description = $"EXCEPTION\n{e}" };
+				return new HttpResult
+				{
+					Ok = false,
+					Description = $"EXCEPTION\n{exception}"
+				};
 			}
 		}
 

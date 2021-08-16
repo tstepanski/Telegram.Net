@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using TelegramNet.Entities;
 using TelegramNet.Entities.Extra;
 using TelegramNet.Entities.Interfaces;
@@ -9,7 +10,6 @@ using TelegramNet.Entities.Keyboards.Inlines;
 using TelegramNet.Entities.Keyboards.Replies;
 using TelegramNet.Enums;
 using TelegramNet.Helpers;
-using TelegramNet.Logging;
 using TelegramNet.Services.Http;
 using TelegramNet.Types;
 
@@ -18,43 +18,31 @@ namespace TelegramNet
 	/// <summary>
 	/// Telegram client. Base implementation of <see cref="BaseTelegramClient"/>.
 	/// </summary>
-	public sealed class TelegramClient : BaseTelegramClient
+	public sealed class TelegramClient : BaseTelegramClient, ITelegramClient
 	{
+		public delegate Task MessageActionHandler(TelegramMessage message);
+
 		private readonly HttpRequester _requester;
 
-		public TelegramClient(string token, bool loggingToConsole = false) : base(token)
+		public TelegramClient(string token, ILogger logger) : base(token, logger)
 		{
-			_requester = new HttpRequester(token);
+			_requester = new HttpRequester(token, logger);
 			ExtClient = new TelegramExtensionClient(this);
 
-			Logger.UseConsole(loggingToConsole);
 			OnUpdateReceived += OnUpdate;
 		}
 
-		#region ~PROPERTIES~
-
-		/// <inheritdoc/>
 		public override SelfUser? Me
 		{
 			get
 			{
-				var me = _requester.ExecuteMethod<ApiUser>("getMe", HttpMethod.Get);
+				var me = _requester.ExecuteMethod<ApiUser>(@"getMe", HttpMethod.Get);
 
 				return me.Ok && me.Result != null
 					? new SelfUser(this, me.Result)
 					: null;
 			}
 		}
-
-		#endregion
-
-		#region ~EVENTS~
-
-		#region ~DELEGATES~
-
-		public delegate Task MessageActionHandler(TelegramMessage message);
-
-		#endregion
 
 		/// <summary>
 		/// Fires when the client has received a new message. Needs pooling (<see cref="BaseTelegramClient.Start()"/>).
@@ -76,43 +64,6 @@ namespace TelegramNet
 		/// </summary>
 		public event MessageActionHandler? OnChannelPostEdited;
 
-		#region ~EVENT WORKERS~
-
-		private Task OnUpdate(TelegramUpdate[] updates)
-		{
-			foreach (var update in updates)
-			{
-				if (update.Message != null)
-				{
-					OnMessageReceived?.Invoke(update.Message);
-				}
-
-				if (update.EditedMessage != null)
-				{
-					OnMessageEdited?.Invoke(update.EditedMessage);
-				}
-
-				if (update.ChannelPost != null)
-				{
-					OnChannelPost?.Invoke(update.ChannelPost);
-				}
-
-				if (update.EditedChannelPost != null)
-				{
-					OnChannelPostEdited?.Invoke(update.EditedChannelPost);
-				}
-			}
-
-			return Task.CompletedTask;
-		}
-
-		#endregion
-
-		#endregion
-
-		#region ~METHODS~
-
-		/// <inheritdoc/>
 		public override async Task<TelegramChat> GetChatAsync(ChatId chat)
 		{
 			return new TelegramChat(this, await TelegramApi.RequestAsync<ApiChat>("getChat", HttpMethod.Get,
@@ -122,7 +73,6 @@ namespace TelegramNet
 				}.ToJson()));
 		}
 
-		/// <inheritdoc/>
 		[Obsolete("This method is obsolete. Use method SendMessageAsync with IKeyboard implementation.")]
 		public override async Task<TelegramClientMessage> SendMessageAsync(ChatId chat,
 			string text,
@@ -358,6 +308,32 @@ namespace TelegramNet
 			return new TelegramClientMessage(this, message, parseMode);
 		}
 
-		#endregion
+		private Task OnUpdate(TelegramUpdate[] updates)
+		{
+			foreach (var update in updates)
+			{
+				if (update.Message != null)
+				{
+					OnMessageReceived?.Invoke(update.Message);
+				}
+
+				if (update.EditedMessage != null)
+				{
+					OnMessageEdited?.Invoke(update.EditedMessage);
+				}
+
+				if (update.ChannelPost != null)
+				{
+					OnChannelPost?.Invoke(update.ChannelPost);
+				}
+
+				if (update.EditedChannelPost != null)
+				{
+					OnChannelPostEdited?.Invoke(update.EditedChannelPost);
+				}
+			}
+
+			return Task.CompletedTask;
+		}
 	}
 }

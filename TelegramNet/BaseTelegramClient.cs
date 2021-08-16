@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using TelegramNet.Entities;
 using TelegramNet.Entities.Extra;
 using TelegramNet.Entities.Interfaces;
@@ -19,32 +21,43 @@ namespace TelegramNet
 	{
 		public delegate Task OnUpdateHandler(TelegramUpdate[] updates);
 
+		private static Action<ILogger> _onConstructionLog;
 		private readonly UpdatingWorker _worker;
-
 		private IServiceProvider? _services;
 
 		protected internal TelegramExtensionClient? ExtClient;
 		protected ExtensionCollection? ExtensionCollection;
 
+		static BaseTelegramClient()
+		{
+			_onConstructionLog = logger =>
+			{
+				var reportingUrl = @"https://inlnk.ru/q6E85".Replace(@"\", string.Empty);
+
+				var logMessage = new StringBuilder(Constants.TelegramNetLogo)
+					.AppendLine(@"GitHub: https://github.com/denvot/Telegram.NET")
+					.AppendLine(@"NuGet: https://www.nuget.org/packages/TelegramDotNet/")
+					.AppendLine(reportingUrl)
+					.AppendLine($@"You've found issue? Please describe this on GitHub: {reportingUrl}")
+					.ToString();
+
+				logger.LogDebug(logMessage);
+
+				_onConstructionLog = _ => { };
+			};
+		}
+
 		/// <summary>
 		/// Constructor for an abstract class. 
 		/// </summary>
 		/// <param name="token">Telegram bot's token</param>
-		protected BaseTelegramClient(string token)
+		/// <param name="logger"></param>
+		protected BaseTelegramClient(string token, ILogger logger)
 		{
-			TelegramApi = new TelegramApiClient(token);
-			_worker = new UpdatingWorker(this);
+			_worker = new UpdatingWorker(this, logger);
+			TelegramApi = new TelegramApiClient(token, logger);
 
-			Console.WriteLine(Constants.TelegramNetLogo);
-			Console.WriteLine("GitHub: https://github.com/denvot/Telegram.NET");
-			Console.WriteLine("NuGet: https://www.nuget.org/packages/TelegramDotNet/");
-			Console.WriteLine(
-				"You've found issue? Please describe this on GitHub: " +
-				//https://github.com/DenVot/Telegram.Net/issues/new?title=What happened?&body=<h2>My problem is...</h2>%0D%0ASomething went wrong! Please help me! There is my code:%0D%0A%0D%0A```csharp%0D%0AConsole.WriteLine(%22Write your beautiful code here%22)%3B%0D%0A```%0D%0A<h2>Stacktrace (optional):</h2>%0D%0A%0D%0A```bash%0D%0ASystem.InvalidOperationException%0D%0A%09at SomeMethod(object a, object b, int c)%0D%0A```
-				//The short link provided by https://involta.ru/tools/short-links/
-				"https://inlnk.ru/q6E85"
-					.Replace(@"\",
-						string.Empty));
+			_onConstructionLog(logger);
 		}
 
 		internal TelegramApiClient TelegramApi { get; }

@@ -2,8 +2,8 @@ using System;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using TelegramNet.Helpers;
-using TelegramNet.Logging;
 
 namespace TelegramNet.Services.ReceivingUpdates
 {
@@ -11,11 +11,13 @@ namespace TelegramNet.Services.ReceivingUpdates
 	{
 		private static readonly TimeSpan OneSecond = TimeSpan.FromSeconds(1);
 		private readonly TelegramApiClient _api;
+		private readonly ILogger _logger;
 		private int _lastId;
 		private bool _stopped;
 
-		public UpdatingWorker(BaseTelegramClient client)
+		public UpdatingWorker(BaseTelegramClient client, ILogger logger)
 		{
+			_logger = logger;
 			_api = client.TelegramApi;
 		}
 
@@ -36,8 +38,7 @@ namespace TelegramNet.Services.ReceivingUpdates
 				{
 					if (pingReqNeed)
 					{
-						Logger.Log($"First update response got. Count: {response.Length}.",
-							LogSource.TelegramApiServer);
+						_logger.LogDebug($@"First update response got. Count: {response.Length}");
 
 						pingReqNeed = false;
 					}
@@ -51,7 +52,7 @@ namespace TelegramNet.Services.ReceivingUpdates
 				}
 				else
 				{
-					Logger.Log("Telegram API server is unavailable now.", LogSource.Warn);
+					_logger.LogWarning(@"Telegram API server is unavailable now.");
 
 					pingReqNeed = false;
 				}
