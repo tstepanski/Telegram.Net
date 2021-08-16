@@ -5,33 +5,33 @@ using TelegramNet.Services.Http.Entities;
 
 namespace TelegramNet
 {
-    internal class TelegramApiClient
-    {
-        public TelegramApiClient(string token)
-        {
-            _requester = new HttpRequester(token);
-        }
+	internal sealed class TelegramApiClient
+	{
+		private readonly HttpRequester _requester;
 
-        private readonly HttpRequester _requester;
+		public TelegramApiClient(string token)
+		{
+			_requester = new HttpRequester(token);
+		}
 
-        public async Task<T> RequestAsync<T>(string method, HttpMethod m, string json = null)
-        {
-            return await Request<T>(method, m, json);
-        }
+		public async Task<T> RequestAsync<T>(string route, HttpMethod method, string? json = null)
+		{
+			return await Request<T>(route, method, json);
+		}
 
-        public async Task<RequestResult<T>> BaseRequestAsync<T>(string method, HttpMethod m, string json = null)
-        {
-            return await _requester.ExecuteMethodAsync<T>(method, m, json);
-        }
+		public async Task<RequestResult<T>> BaseRequestAsync<T>(string route, HttpMethod method, string? json = null)
+		{
+			return await _requester.ExecuteMethodAsync<T>(route, method, json);
+		}
 
-        public async Task<HttpResult> RequestAsync(string method, HttpMethod m, string json = null)
-        {
-            return await _requester.ExecuteMethodAsync(method, m, json);
-        }
+		public async Task<HttpResult> RequestAsync(string route, HttpMethod method, string? json = null)
+		{
+			return await _requester.ExecuteMethodAsync(route, method, json);
+		}
 
-        private async Task<T> Request<T>(string method, HttpMethod httpMethod, string json = null)
-        {
-            return (await BaseRequestAsync<T>(method, httpMethod, json)).EnsureSuccess();
-        }
-    }
+		private async Task<T> Request<T>(string method, HttpMethod httpMethod, string? json = null)
+		{
+			return (await BaseRequestAsync<T>(method, httpMethod, json)).EnsureSuccess();
+		}
+	}
 }

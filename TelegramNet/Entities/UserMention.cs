@@ -2,18 +2,18 @@ using TelegramNet.Entities.Interfaces;
 
 namespace TelegramNet.Entities
 {
-    public class UserMention
-    {
-        internal UserMention(ITelegramUser user)
-        {
-            _user = user;
-        }
+	public sealed class UserMention
+	{
+		private readonly ITelegramUser _user;
 
-        private readonly ITelegramUser _user;
+		internal UserMention(ITelegramUser user)
+		{
+			_user = user;
+		}
 
-        public override string ToString()
-        {
-            return _user.Username.HasValue ? $"@{_user.Username.Value}" : $"tg://user?id={_user.Id}";
-        }
-    }
+		public override string ToString()
+		{
+			return _user.Username ?? $"tg://user?id={_user.Id}";
+		}
+	}
 }

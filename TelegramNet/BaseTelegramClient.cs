@@ -21,10 +21,10 @@ namespace TelegramNet
 
 		private readonly UpdatingWorker _worker;
 
-		private IServiceProvider _services;
+		private IServiceProvider? _services;
 
-		protected internal TelegramExtensionClient ExtClient;
-		protected ExtensionCollection ExtensionCollection;
+		protected internal TelegramExtensionClient? ExtClient;
+		protected ExtensionCollection? ExtensionCollection;
 
 		/// <summary>
 		/// Constructor for an abstract class. 
@@ -52,7 +52,7 @@ namespace TelegramNet
 		/// <summary>
 		/// Gets <see cref="SelfUser"/> which associated with current <see cref="BaseTelegramClient"/>.
 		/// </summary>
-		public abstract SelfUser Me { get; }
+		public abstract SelfUser? Me { get; }
 
 		/// <summary>
 		/// Configures services for bot's extensions
@@ -66,12 +66,17 @@ namespace TelegramNet
 		/// <summary>
 		/// Registers new extension.
 		/// </summary>
-		/// <param name="ext">Extension's module</param>
-		public void RegisterExtension(Extension ext)
+		/// <param name="extension">Extension's module</param>
+		public void RegisterExtension(Extension extension)
 		{
+			if (ExtClient == null || _services == null)
+			{
+				return;
+			}
+
 			ExtensionCollection ??= new ExtensionCollection(this, ExtClient, _services);
 
-			ExtensionCollection.AddExtension(ext);
+			ExtensionCollection.AddExtension(extension);
 		}
 
 		/// <summary>
@@ -125,8 +130,8 @@ namespace TelegramNet
 		public abstract Task<TelegramClientMessage> SendMessageAsync(ChatId idO,
 			string text,
 			ParseMode mode = ParseMode.MarkdownV2,
-			InlineKeyboardMarkup markup = null,
-			ReplyKeyboardMarkup replyMarkup = null);
+			InlineKeyboardMarkup? markup = null,
+			ReplyKeyboardMarkup? replyMarkup = null);
 
 		/// <summary>
 		/// Sends a message to the specified apiChat.
@@ -136,57 +141,44 @@ namespace TelegramNet
 		/// <param name="mode">Parsing mode (Markdown or HTML).</param>
 		/// <param name="keyboard">Keyboard</param>
 		/// <returns>The message, which was sent.</returns>
-		public abstract Task<TelegramClientMessage> SendMessageAsync(ChatId id,
-			string text,
-			ParseMode mode = ParseMode.MarkdownV2,
-			IKeyboard keyboard = null);
+		public abstract Task<TelegramClientMessage?> SendMessageAsync(ChatId id, string text,
+			ParseMode mode = ParseMode.MarkdownV2, IKeyboard? keyboard = null);
 
 		[Obsolete("This method is obsolete. Use method SendDocumentAsync with IKeyboard implementation.")]
 		public abstract Task<TelegramClientMessage> SendDocumentAsync(ChatId idO,
 			Uri fileUrl,
-			Uri thumbUri = null,
-			string caption = null,
+			Uri? thumbUri = null,
+			string? caption = null,
 			ParseMode parseMode = ParseMode.MarkdownV2,
 			bool disableNotification = false,
 			int replyToMessageId = default,
 			bool allowSendingWithoutReply = false,
-			InlineKeyboardMarkup inlineMarkup = null,
-			ReplyKeyboardMarkup replyMarkup = null);
+			InlineKeyboardMarkup? inlineMarkup = null,
+			ReplyKeyboardMarkup? replyMarkup = null);
 
-		public abstract Task<TelegramClientMessage> SendDocumentAsync(ChatId id,
-			Uri fileUrl,
-			Uri thumbUri = null,
-			string caption = null,
-			ParseMode parseMode = ParseMode.MarkdownV2,
-			bool disableNotification = false,
-			int replyToMessageId = default,
-			bool allowSendingWithoutReply = false,
-			IKeyboard keyboard = null);
+		public abstract Task<TelegramClientMessage?> SendDocumentAsync(ChatId id, Uri fileUrl, Uri? thumbUri = null,
+			string? caption = null, ParseMode parseMode = ParseMode.MarkdownV2, bool disableNotification = false,
+			int replyToMessageId = default, bool allowSendingWithoutReply = false, IKeyboard? keyboard = null);
 
 
 		[Obsolete("This method is obsolete. Use method SendPhotoAsync with IKeyboard implementation.")]
 		public abstract Task<TelegramClientMessage> SendPhotoAsync(ChatId idO,
 			Uri photoUrl,
-			string caption = null,
+			string? caption = null,
 			ParseMode parseMode = ParseMode.MarkdownV2,
 			bool disableNotification = false,
 			int replyToMessageId = default,
 			bool allowSendingWithoutReply = false,
-			InlineKeyboardMarkup inlineMarkup = null,
-			ReplyKeyboardMarkup replyMarkup = null);
+			InlineKeyboardMarkup? inlineMarkup = null,
+			ReplyKeyboardMarkup? replyMarkup = null);
 
-		public abstract Task<TelegramClientMessage> SendPhotoAsync(ChatId id,
-			Uri photoUrl,
-			string caption = null,
-			ParseMode parseMode = ParseMode.MarkdownV2,
-			bool disableNotification = false,
-			int replyToMessageId = default,
-			bool allowSendingWithoutReply = false,
-			IKeyboard keyboard = null);
+		public abstract Task<TelegramClientMessage?> SendPhotoAsync(ChatId id, Uri photoUrl, string? caption = null,
+			ParseMode parseMode = ParseMode.MarkdownV2, bool disableNotification = false,
+			int replyToMessageId = default, bool allowSendingWithoutReply = false, IKeyboard? keyboard = null);
 
 		/// <summary>
 		/// Fires when the client has received a new update from the server.
 		/// </summary>
-		public event OnUpdateHandler OnUpdateReceived;
+		public event OnUpdateHandler? OnUpdateReceived;
 	}
 }

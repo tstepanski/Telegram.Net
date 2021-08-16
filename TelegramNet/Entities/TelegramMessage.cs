@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using TelegramNet.Entities.Interfaces;
 using TelegramNet.Entities.Keyboards.Inlines;
 using TelegramNet.Entities.Keyboards.Replies;
-using TelegramNet.ExtraTypes;
 using TelegramNet.Helpers;
 using TelegramNet.Types;
 using TelegramNet.Types.Inlines;
@@ -15,184 +14,201 @@ using TelegramNet.Types.Replies;
 
 namespace TelegramNet.Entities
 {
-    public class TelegramMessage : ITelegramMessage
-    {
-        internal TelegramMessage(BaseTelegramClient client, ApiMessage apiMessage)
-        {
-            if (apiMessage != null)
-            {
-                #region ~Realization of entity~
+	public class TelegramMessage : ITelegramMessage
+	{
+		private readonly TelegramApiClient _client;
 
-                Id = apiMessage.Id;
-                Author = apiMessage.Author != null
-                    ? new TelegramUser(client,
-                        apiMessage.Author)
-                    : default;
-                ForwardFrom = apiMessage.ForwardFrom != null
-                    ? new TelegramUser(client,
-                        apiMessage.ForwardFrom)
-                    : default;
-                ForwardFromChat = apiMessage.ForwardFromApiChat != null
-                    ? new TelegramChat(client,
-                        apiMessage.ForwardFromApiChat)
-                    : default;
-                SenderChat = apiMessage.SenderApiChat != null
-                    ? new TelegramChat(client,
-                        apiMessage.SenderApiChat)
-                    : default;
-                Chat = new TelegramChat(client,
-                    apiMessage.ApiChat); //
-                Timestamp = apiMessage.Date != default
-                    ? UnixParser.Parse(apiMessage.Date)
-                    : default;
-                Captions = apiMessage.CaptionEntities?.Select(x => new MessageCaption(client,
-                        x,
-                        apiMessage.Text))
-                    .ToArray();
-                Text = apiMessage.Text;
-                ForwardFromMessageId = apiMessage.ForwardFromMessageId != default
-                    ? apiMessage.ForwardFromMessageId
-                    : default;
-                ForwardSignature = apiMessage.ForwardSignature;
-                ForwardSenderName = apiMessage.ForwardSenderName;
-                ForwardDate = apiMessage.ForwardDate != default
-                    ? UnixParser.Parse(apiMessage.ForwardDate)
-                    : default;
-                ReplyToMessage = apiMessage.ReplyToApiMessage != null
-                    ? new TelegramMessage(client,
-                        apiMessage.ReplyToApiMessage)
-                    : default;
-                ViaBot = apiMessage.ViaBot != null
-                    ? new TelegramUser(client,
-                        apiMessage.ViaBot)
-                    : default;
-                EditDate = apiMessage.EditDate != default
-                    ? UnixParser.Parse(apiMessage.EditDate)
-                    : default;
-                MediaGroupId = apiMessage.MediaGroupId;
-                AuthorSignature = apiMessage.AuthorSignature;
-                Entities = apiMessage.Entities?.Select(x => new MessageCaption(client,
-                        x,
-                        apiMessage.Text))
-                    .ToArray();
+		internal TelegramMessage(BaseTelegramClient client, ApiMessage? apiMessage)
+		{
+			if (apiMessage == null)
+			{
+				throw new InvalidOperationException(GitHubIssueBuilder.Message(
+					$"Exception while initializing {nameof(TelegramMessage)}.", nameof(InvalidOperationException),
+					$"**Description:**\nDescribe your problem here.\n**StackTrace:**\n{Environment.StackTrace}"));
+			}
 
-                var serializedButtons = apiMessage.ReplyMarkup.ToJson();
+			TelegramUser? CreateUser(ApiUser? user)
+			{
+				return user == null ? null : new TelegramUser(client, user);
+			}
 
-                try
-                {
-                    var but = JsonSerializer.Deserialize<InlineObject>(serializedButtons);
+			TelegramChat? CreateChat(ApiChat? chat)
+			{
+				return chat == null ? null : new TelegramChat(client, chat);
+			}
 
-                    if (but != null)
-                    {
-	                    InlineKeyboardMarkups = but.InlineKeyboard.Select(x => x.Select(z =>
-				                    new InlineKeyboardButton(z.Text,
-					                    new Uri(z.Url),
-					                    new LoginUri(z.ApiLoginUrl.Url == null
-							                    ? new Uri(z.ApiLoginUrl.Url ?? string.Empty)
-							                    : null,
-						                    z.ApiLoginUrl.ForwardText,
-						                    z.ApiLoginUrl.BotUsername,
-						                    z.ApiLoginUrl.RequestWriteAccess)))
-			                    .ToArray())
-		                    .ToArray();
-                    }
-                }
-                catch (Exception)
-                {
-                    // ignored
-                }
+			DateTime? ParseDateTime(int unixTime)
+			{
+				return unixTime == default ? default : UnixParser.Parse(unixTime);
+			}
 
-                try
-                {
-                    var but = JsonSerializer.Deserialize<ApiReplyKeyboardMarkup>(serializedButtons);
+			IEnumerable<MessageCaption>? ConvertEntities(IEnumerable<ApiMessageEntity>? entities)
+			{
+				return entities
+					?.Select(messageEntity => new MessageCaption(client, messageEntity, apiMessage.Text))
+					.ToArray();
+			}
 
-                    if (but != null)
-                    {
-	                    ReplyKeyboardMarkup = new ReplyKeyboardMarkup(but.Keyboard.Select(x => x
-				                    .Select(z => new KeyboardButton(z.Text,
-					                    z.RequestContact,
-					                    z.RequestLocation,
-					                    new KeyboardButtonPollType(z.RequestPoll.Type)))
-				                    .ToArray())
-			                    .ToArray(), but.ResizeKeyboard, but.OneTimeKeyboard, but.InputFieldPlaceHolder,
-		                    but.Selective);
-                    }
-                }
-                catch (Exception)
-                {
-                    // ignored
-                }
+			Id = apiMessage.Id;
+			Text = apiMessage.Text;
+			ForwardFromMessageId = apiMessage.ForwardFromMessageId;
+			ForwardSignature = apiMessage.ForwardSignature;
+			ForwardSenderName = apiMessage.ForwardSenderName;
+			MediaGroupId = apiMessage.MediaGroupId;
+			AuthorSignature = apiMessage.AuthorSignature;
 
-                #endregion
-            }
-            else
-            {
-                throw new InvalidOperationException(GitHubIssueBuilder.Message(
-                    $"Exception while initializing {nameof(TelegramMessage)}.", nameof(InvalidOperationException),
-                    $"**Description:**\nDescribe your problem here.\n**StackTrace:**\n{Environment.StackTrace}"));
-            }
+			Author = CreateUser(apiMessage.Author);
+			ForwardFrom = CreateUser(apiMessage.ForwardFrom);
+			ViaBot = CreateUser(apiMessage.ViaBot);
+			ForwardFromChat = CreateChat(apiMessage.ForwardFromApiChat);
+			SenderChat = CreateChat(apiMessage.SenderApiChat);
+			Chat = new TelegramChat(client, apiMessage.ApiChat);
+			Timestamp = ParseDateTime(apiMessage.Date);
+			ForwardDate = ParseDateTime(apiMessage.ForwardDate);
+			EditDate = ParseDateTime(apiMessage.EditDate);
+			Captions = ConvertEntities(apiMessage.CaptionEntities);
+			Entities = ConvertEntities(apiMessage.Entities);
 
-            _client = client.TelegramApi;
-        }
+			ReplyToMessage = apiMessage.ReplyToApiMessage != null
+				? new TelegramMessage(client, apiMessage.ReplyToApiMessage)
+				: default;
 
-        private readonly TelegramApiClient _client;
+			var serializedButtons = apiMessage.ReplyMarkup.ToJson();
 
-        public int Id { get; }
+			try
+			{
+				var button = JsonSerializer.Deserialize<InlineObject>(serializedButtons);
 
-        public Optional<TelegramUser> Author { get; }
+				if (button != null)
+				{
+					InlineKeyboardMarkups = ConvertInlineObjectButton(button);
+				}
+			}
+			catch (Exception)
+			{
+				// ignored
+			}
 
-        public Optional<TelegramChat> SenderChat { get; }
+			try
+			{
+				var button = JsonSerializer.Deserialize<ApiReplyKeyboardMarkup>(serializedButtons);
 
-        public Optional<DateTime> Timestamp { get; }
+				if (button != null)
+				{
+					ReplyKeyboardMarkup = ConvertReplyKeyboardMarkup(button);
+				}
+			}
+			catch (Exception)
+			{
+				// ignored
+			}
 
-        public Optional<string> Text { get; }
+			_client = client.TelegramApi;
+		}
 
-        public TelegramChat Chat { get; }
+		public InlineKeyboardButton[][]? InlineKeyboardMarkups { get; }
 
-        public Optional<TelegramUser> ForwardFrom { get; }
+		public ReplyKeyboardMarkup? ReplyKeyboardMarkup { get; }
 
-        public Optional<TelegramChat> ForwardFromChat { get; }
+		public int Id { get; }
 
-        public Optional<IEnumerable<MessageCaption>> Captions { get; }
+		public TelegramUser? Author { get; }
 
-        public Optional<int> ForwardFromMessageId { get; }
+		public TelegramChat? SenderChat { get; }
 
-        public Optional<string> ForwardSignature { get; }
+		public DateTime? Timestamp { get; }
 
-        public Optional<string> ForwardSenderName { get; }
+		public string? Text { get; }
 
-        public Optional<DateTime> ForwardDate { get; }
+		public TelegramChat Chat { get; }
 
-        public Optional<TelegramMessage> ReplyToMessage { get; }
+		public TelegramUser? ForwardFrom { get; }
 
-        public Optional<TelegramUser> ViaBot { get; }
+		public TelegramChat? ForwardFromChat { get; }
 
-        public Optional<DateTime> EditDate { get; }
+		public IEnumerable<MessageCaption>? Captions { get; }
 
-        public Optional<string> MediaGroupId { get; }
+		public int? ForwardFromMessageId { get; }
 
-        public Optional<string> AuthorSignature { get; }
+		public string? ForwardSignature { get; }
 
-        public Optional<IEnumerable<MessageCaption>> Entities { get; }
+		public string? ForwardSenderName { get; }
 
-        public InlineKeyboardButton[][] InlineKeyboardMarkups { get; }
+		public DateTime? ForwardDate { get; }
 
-        public ReplyKeyboardMarkup ReplyKeyboardMarkup { get; }
+		public TelegramMessage? ReplyToMessage { get; }
 
-        public async Task<bool> DeleteAsync()
-        {
-            var result = await _client.RequestAsync("deleteMessage", HttpMethod.Post, new Dictionary<string, object>
-            {
-                {"chat_id", Chat.Id.Fetch()},
-                {"message_id", Id}
-            }.ToJson());
+		public TelegramUser? ViaBot { get; }
 
-            return result.Ok;
-        }
+		public DateTime? EditDate { get; }
 
-        private class InlineObject
-        {
-            public ApiInlineKeyboardButton[][] InlineKeyboard { get; set; }
-        }
-    }
+		public string? MediaGroupId { get; }
+
+		public string? AuthorSignature { get; }
+
+		public IEnumerable<MessageCaption>? Entities { get; }
+
+		public async Task<bool> DeleteAsync()
+		{
+			var result = await _client.RequestAsync("deleteMessage", HttpMethod.Post, new Dictionary<string, object?>
+			{
+				{ "chat_id", Chat.Id.Fetch() },
+				{ "message_id", Id }
+			}.ToJson());
+
+			return result.Ok;
+		}
+
+		internal static TelegramMessage? CreateIfMessageNotNull(BaseTelegramClient client, ApiMessage? apiMessage)
+		{
+			return apiMessage == null ? null : new TelegramMessage(client, apiMessage);
+		}
+
+		private static ReplyKeyboardMarkup ConvertReplyKeyboardMarkup(ApiReplyKeyboardMarkup button)
+		{
+			var keyboardButtons = button
+				.Keyboard
+				?.Select(buttons => buttons
+					.Select(ConvertKeyboardButton)
+					.ToArray())
+				.ToArray() ?? Array.Empty<KeyboardButton[]>();
+
+			return new ReplyKeyboardMarkup(keyboardButtons, button.ResizeKeyboard, button.OneTimeKeyboard,
+				button.InputFieldPlaceHolder, button.Selective);
+		}
+
+		private static KeyboardButton ConvertKeyboardButton(ApiKeyboardButton button)
+		{
+			var buttonPollType = new KeyboardButtonPollType(button.RequestPoll?.Type);
+
+			return new KeyboardButton(button.Text, button.RequestContact, button.RequestLocation, buttonPollType);
+		}
+
+		private static InlineKeyboardButton[][]? ConvertInlineObjectButton(InlineObject button)
+		{
+			return button
+				.InlineKeyboard
+				?.Select(keyboardButtons => keyboardButtons
+					.Select(ConvertInlineKeyboardButton)
+					.ToArray())
+				.ToArray();
+		}
+
+		private static InlineKeyboardButton ConvertInlineKeyboardButton(ApiInlineKeyboardButton button)
+		{
+			var apiLoginUrl = button.ApiLoginUrl;
+			var url = new Uri(button.Url ?? string.Empty);
+			var loginUri = new Uri(apiLoginUrl?.Url ?? string.Empty);
+
+			var loginUrl = new LoginUri(loginUri, apiLoginUrl?.ForwardText, apiLoginUrl?.BotUsername,
+				apiLoginUrl?.RequestWriteAccess ?? false);
+
+			return new InlineKeyboardButton(button.Text, url, loginUrl);
+		}
+
+		private class InlineObject
+		{
+			public ApiInlineKeyboardButton[][]? InlineKeyboard { get; set; }
+		}
+	}
 }

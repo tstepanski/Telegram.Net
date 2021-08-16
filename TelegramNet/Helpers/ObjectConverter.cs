@@ -1,29 +1,21 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 
 namespace TelegramNet.Helpers
 {
-    internal static class ObjectConverter
-    {
-        public static Dictionary<string, object> ToDictionary<T>(this T entity)
-        {
-            var type = typeof(T);
+	internal static class ObjectConverter
+	{
+		public static IReadOnlyDictionary<string, object?> ToDictionary<T>(this T entity)
+		{
+			return typeof(T)
+				.GetProperties()
+				.ToDictionary(property => property.Name, property => property.GetValue(entity));
+		}
 
-            var props = type.GetProperties();
-
-            var vals = new Dictionary<string, object>();
-
-            foreach (var t in props)
-            {
-	            vals.Add(t.Name, t.GetValue(entity));
-            }
-
-            return vals;
-        }
-
-        public static string ToJson<T>(this T entity)
-        {
-            return JsonSerializer.Serialize(entity);
-        }
-    }
+		public static string ToJson<T>(this T entity)
+		{
+			return JsonSerializer.Serialize(entity);
+		}
+	}
 }

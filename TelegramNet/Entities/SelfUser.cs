@@ -2,13 +2,13 @@ using TelegramNet.Types;
 
 namespace TelegramNet.Entities
 {
-    public class SelfUser : TelegramUser
-    {
-        internal SelfUser(BaseTelegramClient client, ApiUser user) : base(client, user)
-        {
-            SelfClient = client;
-        }
+	public sealed class SelfUser : TelegramUser
+	{
+		internal SelfUser(BaseTelegramClient client, ApiUser user) : base(client, user)
+		{
+			SelfClient = client;
+		}
 
-        public BaseTelegramClient SelfClient { get; }
-    }
+		public BaseTelegramClient SelfClient { get; }
+	}
 }

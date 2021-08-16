@@ -7,95 +7,104 @@ using TelegramNet.Enums;
 
 namespace TelegramNet.Helpers.MessageTemplates
 {
-    public class MessageTemplate
-    {
-        public MessageTemplate(BaseTelegramClient client)
-        {
-            _client = client;
-        }
+	public sealed class MessageTemplate
+	{
+		private readonly BaseTelegramClient _client;
 
-        private readonly BaseTelegramClient _client;
+		public MessageTemplate(BaseTelegramClient client)
+		{
+			_client = client;
+		}
 
-        public string Text { get; private set; }
-        public IKeyboard Keyboard { get; private set; }
-        public ParseMode ParseMode { get; private set; } = ParseMode.MarkdownV2;
-        public Uri DocumentUri { get; private set; }
-        public Uri ImageUri { get; private set; }
+		public string? Text { get; private set; }
+		public IKeyboard? Keyboard { get; private set; }
+		public ParseMode ParseMode { get; private set; } = ParseMode.MarkdownV2;
+		public Uri? DocumentUri { get; private set; }
+		public Uri? ImageUri { get; private set; }
 
-        internal async Task<TelegramClientMessage[]> ExecuteTemplateAsync(ChatId id)
-        {
-            var msgs = new List<TelegramClientMessage>();
-            if (Text != null)
-            {
-                var msg = await _client.SendMessageAsync(id, Text, ParseMode, Keyboard);
-                if (msg != null)
-                {
-	                msgs.Add(msg);
-                }
-            }
+		internal async Task<TelegramClientMessage[]> ExecuteTemplateAsync(ChatId id)
+		{
+			var messages = new List<TelegramClientMessage>();
 
-            if (DocumentUri != null)
-            {
-                var msg = await _client.SendDocumentAsync(id: id, DocumentUri);
-                if (msg != null)
-                {
-	                msgs.Add(msg);
-                }
-            }
+			if (Text != null)
+			{
+				var message = await _client.SendMessageAsync(id, Text, ParseMode, Keyboard);
 
-            if (ImageUri != null)
-            {
-                var msg = await _client.SendPhotoAsync(id: id, ImageUri);
-                if (msg != null)
-                {
-	                msgs.Add(msg);
-                }
-            }
+				if (message != null)
+				{
+					messages.Add(message);
+				}
+			}
 
-            return msgs.ToArray();
-        }
+			if (DocumentUri != null)
+			{
+				var message = await _client.SendDocumentAsync(id: id, DocumentUri);
 
-        public MessageTemplate WithText(string text)
-        {
-            Text = text;
-            return this;
-        }
+				if (message != null)
+				{
+					messages.Add(message);
+				}
+			}
 
-        public MessageTemplate UseParseMode(ParseMode mode)
-        {
-            ParseMode = mode;
-            return this;
-        }
+			// ReSharper disable once InvertIf
+			if (ImageUri != null)
+			{
+				var message = await _client.SendPhotoAsync(id: id, ImageUri);
 
-        public MessageTemplate WithKeyboard(IKeyboard keyboard)
-        {
-            Keyboard = keyboard;
-            return this;
-        }
+				if (message != null)
+				{
+					messages.Add(message);
+				}
+			}
 
-        public MessageTemplate WithDocument(Uri documentUri)
-        {
-            DocumentUri = documentUri;
-            return this;
-        }
+			return messages.ToArray();
+		}
 
-        public MessageTemplate WithImage(Uri imgUri)
-        {
-            ImageUri = imgUri;
-            return this;
-        }
+		public MessageTemplate WithText(string text)
+		{
+			Text = text;
 
-        public async Task<TelegramClientMessage[]> SendAsync(ChatId id)
-        {
-            var chat = await _client.GetChatAsync(id);
+			return this;
+		}
 
-            if (chat == null)
-            {
-	            throw new InvalidOperationException($"Can't find the apiChat associated with {id}");
-            }
+		public MessageTemplate UseParseMode(ParseMode mode)
+		{
+			ParseMode = mode;
 
-            var mess = await ExecuteTemplateAsync(chat);
-            return mess;
-        }
-    }
+			return this;
+		}
+
+		public MessageTemplate WithKeyboard(IKeyboard? keyboard)
+		{
+			Keyboard = keyboard;
+
+			return this;
+		}
+
+		public MessageTemplate WithDocument(Uri documentUri)
+		{
+			DocumentUri = documentUri;
+
+			return this;
+		}
+
+		public MessageTemplate WithImage(Uri imgUri)
+		{
+			ImageUri = imgUri;
+
+			return this;
+		}
+
+		public async Task<TelegramClientMessage[]> SendAsync(ChatId id)
+		{
+			var chat = await _client.GetChatAsync(id);
+
+			if (chat == null)
+			{
+				throw new InvalidOperationException($"Can't find the apiChat associated with {id}");
+			}
+
+			return await ExecuteTemplateAsync(chat);
+		}
+	}
 }
